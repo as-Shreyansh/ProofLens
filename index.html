@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
+  <title>ProofLens — Opportunity Verification & Threat Analysis</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Motion.dev (Official Motion library) -->
+  <script src="https://cdn.jsdelivr.net/npm/motion@11.11.17/dist/motion.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    code, pre, .mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .draggable-chip {
+      user-select: none;
+      touch-action: pan-y;
+      cursor: grab;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .draggable-chip:active {
+      cursor: grabbing;
+    }
+    .drop-active {
+      border-color: #78716c !important;
+      background-color: #f5f5f4 !important;
+    }
+    /* Hide scrollbars for smooth native horizontal scroll on mobile */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    /* Safe area padding for mobile notches */
+    .safe-bottom {
+      padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    }
+  </style>
+</head>
+<body class="bg-[#fafaf9] text-stone-800 min-h-screen flex flex-col antialiased selection:bg-stone-200">
+
+  <!-- Top Navigation -->
+  <header class="border-b border-stone-200/80 bg-white/95 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-3 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-2">
+      <!-- Logo & Title -->
+      <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+        <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-md bg-stone-100 border border-stone-200 flex items-center justify-center text-stone-700 shadow-sm">
+          <i data-lucide="shield" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+        </div>
+        <div class="flex items-center gap-1.5 sm:gap-2">
+          <span class="text-sm sm:text-base font-semibold tracking-tight text-stone-900">ProofLens</span>
+          <span class="text-[10px] sm:text-xs px-1.5 py-0.5 rounded bg-stone-100 text-stone-600 border border-stone-200 font-mono font-medium hidden xs:inline">v1.0</span>
+        </div>
+      </div>
+      
+      <!-- Nav Tabs (Horizontally scrollable with zero layout breakage on mobile) -->
+      <nav class="flex items-center gap-1 sm:gap-2 overflow-x-auto no-scrollbar py-1">
+        <button onclick="switchView('scanner')" id="nav-scanner" class="px-2.5 sm:px-3.5 py-1.5 rounded-md text-xs sm:text-sm font-medium text-stone-900 bg-stone-100 border border-stone-200 whitespace-nowrap flex-shrink-0 transition">Scanner</button>
+        <button onclick="switchView('methodology')" id="nav-methodology" class="px-2.5 sm:px-3.5 py-1.5 rounded-md text-xs sm:text-sm font-medium text-stone-600 hover:text-stone-900 whitespace-nowrap flex-shrink-0 transition">Methodology</button>
+        <button onclick="switchView('privacy')" id="nav-privacy" class="px-2.5 sm:px-3.5 py-1.5 rounded-md text-xs sm:text-sm font-medium text-stone-600 hover:text-stone-900 whitespace-nowrap flex-shrink-0 transition">
+          <span class="sm:hidden">Privacy</span>
+          <span class="hidden sm:inline">Privacy Policy</span>
+        </button>
+        <button onclick="switchView('terms')" id="nav-terms" class="px-2.5 sm:px-3.5 py-1.5 rounded-md text-xs sm:text-sm font-medium text-stone-600 hover:text-stone-900 whitespace-nowrap flex-shrink-0 transition">
+          <span class="sm:hidden">Terms</span>
+          <span class="hidden sm:inline">Terms & Conditions</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- VIEW 1: SCANNER -->
+  <div id="view-scanner" class="flex-1 max-w-6xl w-full mx-auto px-3.5 sm:px-6 py-5 sm:py-8 flex flex-col gap-6 sm:gap-8">
+    
+    <!-- Header / Scope Description -->
+    <div class="pb-5 sm:pb-6 border-b border-stone-200/80">
+      <h1 class="text-xl sm:text-2xl lg:text-3xl font-semibold text-stone-900 tracking-tight leading-snug">
+        Opportunity Verification & Heuristic Threat Analysis
+      </h1>
+      <p class="text-xs sm:text-base text-stone-600 mt-1.5 sm:mt-2 max-w-3xl leading-relaxed">
+        ProofLens evaluates recruitment letters, internship notices, and academic communications against advance payment demands, domain impersonation patterns, and unmonitored communication routes.
+      </p>
+
+      <!-- Reference Samples for Testing (Mobile native carousel + desktop wrap) -->
+      <div class="mt-4 sm:mt-5 pt-3.5 sm:pt-4 border-t border-stone-200/70">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs sm:text-sm text-stone-500 font-medium">Reference Samples:</span>
+          <span class="text-[11px] sm:text-xs text-stone-400 font-mono">tap or drag to load</span>
+        </div>
+        <div class="flex flex-nowrap sm:flex-wrap items-center gap-2 overflow-x-auto no-scrollbar pb-2 -mx-3.5 px-3.5 sm:mx-0 sm:px-0" id="sampleChipsContainer">
+          <div data-sample="scam1" class="draggable-chip px-3 py-2 rounded-md bg-white border border-stone-200 text-stone-700 text-xs sm:text-sm font-medium shadow-sm flex items-center gap-1.5 flex-shrink-0 active:bg-stone-50 transition">
+            <i data-lucide="grip-vertical" class="w-3.5 h-3.5 text-stone-400 flex-shrink-0"></i>
+            <span>Sample A: Advance Equipment Deposit</span>
+          </div>
+          <div data-sample="scam2" class="draggable-chip px-3 py-2 rounded-md bg-white border border-stone-200 text-stone-700 text-xs sm:text-sm font-medium shadow-sm flex items-center gap-1.5 flex-shrink-0 active:bg-stone-50 transition">
+            <i data-lucide="grip-vertical" class="w-3.5 h-3.5 text-stone-400 flex-shrink-0"></i>
+            <span>Sample B: Unaudited Messaging Channel</span>
+          </div>
+          <div data-sample="startup" class="draggable-chip px-3 py-2 rounded-md bg-white border border-stone-200 text-stone-700 text-xs sm:text-sm font-medium shadow-sm flex items-center gap-1.5 flex-shrink-0 active:bg-stone-50 transition">
+            <i data-lucide="grip-vertical" class="w-3.5 h-3.5 text-stone-400 flex-shrink-0"></i>
+            <span>Sample C: Non-Standard Host Notice</span>
+          </div>
+          <div data-sample="legit" class="draggable-chip px-3 py-2 rounded-md bg-white border border-stone-200 text-stone-700 text-xs sm:text-sm font-medium shadow-sm flex items-center gap-1.5 flex-shrink-0 active:bg-stone-50 transition">
+            <i data-lucide="grip-vertical" class="w-3.5 h-3.5 text-stone-400 flex-shrink-0"></i>
+            <span>Sample D: Institutional Recruitment</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-7 items-start">
+      
+      <!-- Input Panel (5 Cols) -->
+      <div class="lg:col-span-5 flex flex-col gap-4">
+        <div id="dropZoneContainer" class="bg-white border border-stone-200/90 rounded-lg p-3.5 sm:p-5 shadow-sm flex flex-col transition-colors duration-200">
+          <div class="flex items-center justify-between mb-2">
+            <label for="noticeInput" class="text-xs sm:text-sm font-semibold uppercase tracking-wider text-stone-600">
+              Input Payload
+            </label>
+            <button onclick="clearInput()" class="text-xs sm:text-sm text-stone-400 hover:text-stone-700 transition p-1">Clear</button>
+          </div>
+
+          <textarea id="noticeInput" rows="10" class="w-full bg-[#fcfcfb] border border-stone-200 rounded-md p-3 sm:p-3.5 text-stone-900 text-sm sm:text-base focus:outline-none focus:border-stone-400 resize-none font-mono leading-relaxed transition" placeholder="Paste communication body, email headers, or offer text for verification..."></textarea>
+
+          <div class="mt-3.5 pt-3 border-t border-stone-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <label class="cursor-pointer text-xs sm:text-sm text-stone-600 hover:text-stone-900 flex items-center gap-1.5 transition py-1">
+              <i data-lucide="file-up" class="w-4 h-4 flex-shrink-0"></i>
+              <span>Upload Plain Text (.txt)</span>
+              <input type="file" id="fileUpload" accept=".txt,.log,.md" class="hidden" onchange="handleFileUpload(event)">
+            </label>
+            <button id="btnExecute" onclick="runVerification()" class="w-full sm:w-auto px-4 py-2.5 bg-stone-900 hover:bg-stone-800 text-white font-medium text-xs sm:text-sm rounded-md transition flex items-center justify-center gap-2 shadow-sm active:scale-95">
+              <i data-lucide="play" class="w-3.5 h-3.5"></i>
+              <span>Execute Analysis</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="p-3.5 sm:p-4 bg-stone-100/70 border border-stone-200/70 rounded-lg text-xs sm:text-sm text-stone-600 space-y-1">
+          <div class="font-semibold text-stone-800">Technical Scope</div>
+          <p class="leading-relaxed">
+            Evaluates advance fee demands, free mail hosts, domain spoofing indicators, non-interview selection claims, and unmonitored communication routes.
+          </p>
+        </div>
+      </div>
+
+      <!-- Results Panel (7 Cols) -->
+      <div class="lg:col-span-7 flex flex-col gap-4">
+        
+        <!-- Metrics Row (2 cols on small phone, 4 on desktop) -->
+        <div id="metricsRow" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
+          <div class="metric-box bg-white border border-stone-200/90 rounded-lg p-3 sm:p-3.5 shadow-sm transition">
+            <span class="text-[11px] sm:text-xs font-medium text-stone-400 uppercase tracking-wider block">Risk Rating</span>
+            <div id="riskScore" class="text-lg sm:text-2xl font-bold font-mono text-stone-700 mt-0.5 sm:mt-1">Pending</div>
+            <span class="text-[10px] sm:text-xs text-stone-400">Heuristic Score</span>
+          </div>
+
+          <div class="metric-box bg-white border border-stone-200/90 rounded-lg p-3 sm:p-3.5 shadow-sm transition">
+            <span class="text-[11px] sm:text-xs font-medium text-stone-400 uppercase tracking-wider block">Classification</span>
+            <div id="classification" class="text-xs sm:text-sm font-semibold text-stone-700 mt-1 sm:mt-1.5 truncate">Awaiting execution</div>
+            <span class="text-[10px] sm:text-xs text-stone-400">Assessed Status</span>
+          </div>
+
+          <div class="metric-box bg-white border border-stone-200/90 rounded-lg p-3 sm:p-3.5 shadow-sm transition">
+            <span class="text-[11px] sm:text-xs font-medium text-stone-400 uppercase tracking-wider block">Violations</span>
+            <div id="violationsCount" class="text-lg sm:text-2xl font-bold font-mono text-stone-700 mt-0.5 sm:mt-1">0</div>
+            <span class="text-[10px] sm:text-xs text-stone-400">Triggers found</span>
+          </div>
+
+          <div class="metric-box bg-white border border-stone-200/90 rounded-lg p-3 sm:p-3.5 shadow-sm transition">
+            <span class="text-[11px] sm:text-xs font-medium text-stone-400 uppercase tracking-wider block">Claimed Org</span>
+            <div id="claimedEntity" class="text-xs sm:text-sm font-semibold text-stone-700 mt-1 sm:mt-1.5 truncate">None detected</div>
+            <span class="text-[10px] sm:text-xs text-stone-400">Entity extraction</span>
+          </div>
+        </div>
+
+        <!-- Summary Note -->
+        <div id="summaryNote" class="p-3 sm:p-3.5 bg-white border border-stone-200/80 rounded-lg text-xs sm:text-sm text-stone-700 shadow-sm flex items-start gap-2.5 sm:gap-3">
+          <i data-lucide="terminal" class="w-4 h-4 text-stone-500 flex-shrink-0 mt-0.5"></i>
+          <span id="summaryMessage" class="leading-relaxed">Ready. Load a reference sample or supply text in the input area to inspect heuristics.</span>
+        </div>
+
+        <!-- Evidence Breakdown Table -->
+        <div class="bg-white border border-stone-200/90 rounded-lg shadow-sm overflow-hidden">
+          <div class="px-4 sm:px-5 py-3 border-b border-stone-100 flex items-center justify-between">
+            <span class="text-xs sm:text-sm font-semibold uppercase tracking-wider text-stone-700">Heuristic Audit Findings</span>
+            <span id="findingsCount" class="text-xs sm:text-sm font-mono text-stone-500">0 findings</span>
+          </div>
+
+          <div id="findingsContainer" class="p-3 sm:p-4 space-y-2.5 max-h-[380px] overflow-y-auto">
+            <div class="text-center py-8 sm:py-10 text-xs sm:text-sm text-stone-400 font-mono">
+              Awaiting data input.
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Protocol -->
+        <div class="p-3 sm:p-3.5 bg-stone-100/70 border border-stone-200/70 rounded-lg text-xs sm:text-sm text-stone-600">
+          <div class="font-semibold text-stone-800 mb-0.5 sm:mb-1">Recommended Response Protocol</div>
+          <div id="actionProtocol" class="leading-relaxed text-stone-600">
+            Verify any recruitment notice independently through the organization's official institutional domain or university career placement authorities.
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- VIEW 2: METHODOLOGY -->
+  <div id="view-methodology" class="hidden flex-1 max-w-4xl w-full mx-auto px-3.5 sm:px-6 py-6 sm:py-8 flex flex-col gap-5 sm:gap-6">
+    <div class="border-b border-stone-200 pb-3.5 sm:pb-4">
+      <h2 class="text-lg sm:text-2xl font-semibold text-stone-900 tracking-tight">Technical Methodology & Heuristics</h2>
+      <p class="text-xs sm:text-sm text-stone-500 mt-1">ProofLens operates on deterministic rule heuristics rather than probabilistic generative estimation.</p>
+    </div>
+
+    <div class="space-y-3.5 sm:space-y-4 text-xs sm:text-sm text-stone-700 leading-relaxed">
+      <div class="bg-white border border-stone-200/80 rounded-lg p-3.5 sm:p-4 shadow-sm space-y-1">
+        <h3 class="font-semibold text-stone-900 text-sm sm:text-base">1. Advance Fee Demands (Rule ID: FIN-01)</h3>
+        <p class="text-stone-600 leading-relaxed">
+          Scrutinizes text for requirements involving security deposits, laptop courier payments, training material charges, or documentation processing fees. Formal enterprise employment practices prohibit candidates from paying onboarding expenses.
+        </p>
+      </div>
+
+      <div class="bg-white border border-stone-200/80 rounded-lg p-3.5 sm:p-4 shadow-sm space-y-1">
+        <h3 class="font-semibold text-stone-900 text-sm sm:text-base">2. Free Mail Impersonation (Rule ID: IDN-02)</h3>
+        <p class="text-stone-600 leading-relaxed">
+          Detects the utilization of public mail services (e.g., Gmail, Yahoo, Outlook) by entities purporting to represent established enterprise organizations. Legitimate corporate recruitment is conducted via registered organizational domains with SPF/DKIM validation.
+        </p>
+      </div>
+
+      <div class="bg-white border border-stone-200/80 rounded-lg p-3.5 sm:p-4 shadow-sm space-y-1">
+        <h3 class="font-semibold text-stone-900 text-sm sm:text-base">3. Suspicious Domain Classification (Rule ID: NET-03)</h3>
+        <p class="text-stone-600 leading-relaxed">
+          Identifies non-standard, low-cost top-level domains (.xyz, .top, .work, .buzz) and temporary hosting services frequently leveraged for short-lived credential harvesting and phishing pages.
+        </p>
+      </div>
+
+      <div class="bg-white border border-stone-200/80 rounded-lg p-3.5 sm:p-4 shadow-sm space-y-1">
+        <h3 class="font-semibold text-stone-900 text-sm sm:text-base">4. Process Anomaly & Direct Selection (Rule ID: PROC-04)</h3>
+        <p class="text-stone-600 leading-relaxed">
+          Evaluates offers extended without formal skills assessment, coding examinations, or interviews. Authentic technical roles enforce structured evaluation procedures.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIEW 3: PRIVACY POLICY -->
+  <div id="view-privacy" class="hidden flex-1 max-w-4xl w-full mx-auto px-3.5 sm:px-6 py-6 sm:py-8 flex flex-col gap-5 sm:gap-6">
+    <div class="border-b border-stone-200 pb-3.5 sm:pb-4">
+      <h2 class="text-lg sm:text-2xl font-semibold text-stone-900 tracking-tight">Privacy Policy & Data Handling Specification</h2>
+      <p class="text-xs sm:text-sm text-stone-500 mt-1">Effective Date: October 2026 | Production Compliance Standard</p>
+    </div>
+
+    <div class="space-y-3.5 sm:space-y-4 text-xs sm:text-sm text-stone-700 leading-relaxed">
+      
+      <div class="bg-white border border-stone-200/80 rounded-lg p-3.5 sm:p-4 shadow-sm space-y-1">
+        <h3 class="font-semibold text-stone-900 text-sm sm:text-base">1. Zero Persistent Data Retention</h3>
+        <p class="text-stone-600 leading-relaxed">
+          ProofLens processes submitted text and uploaded documents entirely in-memory within your active browser session. No pasted communications, email headers, extracted names, or personal identifying data (PII) are stored on disk, written to remote databases, or logged to remote servers.
+        </p>
+      </div>
+
+      <div class="bg-white border border-stone-200/80 rounded-lg p-3.5 sm:p-4 shadow-sm space-y-1">
+        <h3 class="font-semibold text-stone-900 text-sm sm:text-base">2. Client-Side Execution</h3>
+        <p class="text-stone-600 leading-relaxed">
+          The heuristic verification algorithms execute locally in your client environment. No network requests containing your input payload are dispatched to third-party tracking services or advertising entities.
+        </p>
+      </div>
+
+      <div class="bg-white border border-stone-200/80 rounded-lg p-3.5 sm:p-4 shadow-sm space-y-1">
+        <h3 class="font-semibold text-stone-900 text-sm sm:text-base">3. No Training on User Data</h3>
+        <p class="text-stone-600 leading-relaxed">
+          Your submitted notices and confidential offer documents are never harvested, aggregated, or utilized to train external machine learning models or commercial classifiers.
+        </p>
+      </div>
+
+      <div class="bg-white border border-stone-200/80 rounded-lg p-3.5 sm:p-4 shadow-sm space-y-1">
+        <h3 class="font-semibold text-stone-900 text-sm sm:text-base">4. Telemetry and Analytics</h3>
+        <p class="text-stone-600 leading-relaxed">
+          This deployment contains zero third-party tracking cookies, user profiling beacons, or advertising telemetry scripts.
+        </p>
+      </div>
+
+      <div class="bg-white border border-stone-200/80 rounded-lg p-3.5 sm:p-4 shadow-sm space-y-1">
+        <h3 class="font-semibold text-stone-900 text-sm sm:text-base">5. Responsible Disclosure</h3>
+        <p class="text-stone-600 leading-relaxed">
+          ProofLens is a security utility intended to detect unauthorized solicitation and credential fraud. If you identify vulnerabilities or evasion techniques within the heuristic ruleset, submit technical reports via the project repository.
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- VIEW 4: TERMS AND CONDITIONS -->
+  <div id="view-terms" class="hidden flex-1 max-w-4xl w-full mx-auto px-3.5 sm:px-6 py-6 sm:py-8 flex flex-col gap-5 sm:gap-6">
+    <div class="border-b border-stone-200 pb-3.5 sm:pb-4">
+      <h2 class="text-lg sm:text-2xl font-semibold text-stone-900 tracking-tight">Terms and Conditions of Use</h2>
+      <p class="text-xs sm:text-sm text-stone-500 mt-1">Effective Date: October 2026 | Production Compliance Standard</p>
+    </div>
+
+    <div class="space-y-3.5 sm:space-y-4 text-xs sm:text-sm text-stone-700 leading-relaxed">
+      
+      <div class="bg-white border border-stone-200/80 rounded-lg p-3.5 sm:p-4 shadow-sm space-y-1">
+        <h3 class="font-semibold text-stone-900 text-sm sm:text-base">1. Nature of the Utility</h3>
+        <p class="text-stone-600 leading-relaxed">
+          ProofLens is an analytical, evidence-based threat detection and verification system. It evaluates communications against heuristic rules to assist users in identifying fraudulent recruitment and advance-fee solicitation schemes.
+        </p>
+      </div>
+
+      <div class="bg-white border border-stone-200/80 rounded-lg p-3.5 sm:p-4 shadow-sm space-y-1">
+        <h3 class="font-semibold text-stone-900 text-sm sm:text-base">2. Non-Advisory & Informational Purpose</h3>
+        <p class="text-stone-600 leading-relaxed">
+          The diagnostic results, risk scores, and recommendations generated by ProofLens are provided solely for general informational and threat-awareness purposes. ProofLens does not provide legal, financial, or formal employment advice. Users are required to independently verify any communication directly through official corporate career portals or university Training & Placement authorities.
+        </p>
+      </div>
+
+      <div class="bg-white border border-stone-200/80 rounded-lg p-3.5 sm:p-4 shadow-sm space-y-1">
+        <h3 class="font-semibold text-stone-900 text-sm sm:text-base">3. Permitted & Acceptable Use</h3>
+        <p class="text-stone-600 leading-relaxed">
+          You agree to utilize ProofLens exclusively for lawful purposes, such as analyzing suspicious emails, notices, or offers received by you or your academic institution. You agree not to attempt to disrupt, denial-of-service, or systematically exploit the verification endpoints.
+        </p>
+      </div>
+
+      <div class="bg-white border border-stone-200/80 rounded-lg p-3.5 sm:p-4 shadow-sm space-y-1">
+        <h3 class="font-semibold text-stone-900 text-sm sm:text-base">4. Nominative Use of Corporate Names</h3>
+        <p class="text-stone-600 leading-relaxed">
+          References to corporate names, brand names, or trademarks (such as Microsoft, Google, Infosys, etc.) within the tool are used strictly in a nominative capacity to identify, report, and analyze impersonation patterns. ProofLens is not affiliated with, sponsored by, or endorsed by these third-party organizations.
+        </p>
+      </div>
+
+      <div class="bg-white border border-stone-200/80 rounded-lg p-3.5 sm:p-4 shadow-sm space-y-1">
+        <h3 class="font-semibold text-stone-900 text-sm sm:text-base">5. Limitation of Liability</h3>
+        <p class="text-stone-600 leading-relaxed">
+          ProofLens and its developers provide this platform on an "as is" and "as available" basis without warranties of any kind. Under no circumstances shall ProofLens be liable for any direct, indirect, incidental, or consequential damages resulting from decisions made based on heuristic outputs.
+        </p>
+      </div>
+
+      <div class="bg-white border border-stone-200/80 rounded-lg p-3.5 sm:p-4 shadow-sm space-y-1">
+        <h3 class="font-semibold text-stone-900 text-sm sm:text-base">6. Amendments</h3>
+        <p class="text-stone-600 leading-relaxed">
+          These terms may be updated periodically to reflect changes in legal standards or security heuristic capabilities. Continued usage of the utility constitutes acceptance of the current terms.
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="border-t border-stone-200/70 bg-white py-5 text-xs sm:text-sm text-stone-500 safe-bottom">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+      <div>
+        ProofLens — Digital Trust & Security Architecture
+      </div>
+      <div class="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3.5">
+        <button onclick="switchView('privacy')" class="hover:text-stone-800 transition py-1">Privacy Policy</button>
+        <span>•</span>
+        <button onclick="switchView('terms')" class="hover:text-stone-800 transition py-1">Terms & Conditions</button>
+        <span>•</span>
+        <button onclick="switchView('methodology')" class="hover:text-stone-800 transition py-1">Methodology</button>
+        <span>•</span>
+        <span class="font-mono text-xs text-stone-400">Custom Domain Ready</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+
+    // Setup Motion.dev integrations
+    const { animate, spring, stagger } = window.Motion || {};
+
+    // Layout Transition via Motion.dev
+    function switchView(viewName) {
+      const views = ['view-scanner', 'view-methodology', 'view-privacy', 'view-terms'];
+      const navIds = ['nav-scanner', 'nav-methodology', 'nav-privacy', 'nav-terms'];
+
+      navIds.forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) btn.className = 'px-2.5 sm:px-3.5 py-1.5 rounded-md text-xs sm:text-sm font-medium text-stone-600 hover:text-stone-900 whitespace-nowrap flex-shrink-0 transition';
+      });
+
+      views.forEach(vId => {
+        const el = document.getElementById(vId);
+        if (el) el.classList.add('hidden');
+      });
+
+      const activeNav = document.getElementById(`nav-${viewName}`);
+      if (activeNav) {
+        activeNav.className = 'px-2.5 sm:px-3.5 py-1.5 rounded-md text-xs sm:text-sm font-medium text-stone-900 bg-stone-100 border border-stone-200 whitespace-nowrap flex-shrink-0 transition';
+      }
+
+      const activeView = document.getElementById(`view-${viewName}`);
+      if (activeView) {
+        activeView.classList.remove('hidden');
+        if (window.Motion && animate) {
+          animate(activeView, { opacity: [0, 1], y: [6, 0] }, { duration: 0.22, easing: 'ease-out' });
+        }
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      lucide.createIcons();
+    }
+
+    // Reference Samples
+    const samples = {
+      scam1: `Dear Student,
+
+Congratulations! We are pleased to inform you that you have been shortlisted for the position of Software Development Intern at Microsoft India.
+
+Stipend: ₹45,000 per month
+Duration: 6 Months (Work from home)
+Selection Mode: Direct selection based on your profile (No interview required).
+
+Please note: To receive your company-issued ThinkPad laptop, welcome kit, and security access token, you are required to deposit a 100% refundable security amount of ₹2,499 via UPI to hr.microsoft.onboarding@upi within 3 hours.
+
+This fee will be refunded with your first month stipend. Failure to deposit within 3 hours will result in immediate cancellation of your offer.
+
+For queries contact: hr.microsoft.recruiters2026@gmail.com
+Regards,
+Recruitment Cell, Microsoft India`,
+
+      scam2: `URGENT HIRING!! Earn ₹2000 - ₹5000 daily from home!
+
+Part-time online data entry & typing job.
+No qualifications, no skills needed. Students eligible.
+Guaranteed payment every evening.
+
+Limited seats available! Hurry, offer expires today!
+To start immediately, do NOT email. Send a direct WhatsApp message to +919876543210 or join our Telegram channel at t.me/fast_income_jobs.
+
+Registration charge of ₹499 required for software activation key.`,
+
+      startup: `Hi there,
+
+We came across your profile and would like to invite you for an internship role in Frontend Development at NexaGen Digital Labs.
+
+Stipend: ₹12,000 / month
+Location: Remote
+Timeline: 3 months
+
+Please fill in your project portfolio and submit your GitHub link at http://nexagen-careers.temp-site.xyz/apply.
+Selected candidates will go through a 30-minute technical interview with our engineering lead.
+
+If you have questions, reach out to contact@nexagendigital.com.
+Note: Offer closes this Friday.`,
+
+      legit: `Dear Candidate,
+
+Following your technical and HR interview rounds, Infosys Ltd. is pleased to extend an offer for the position of Systems Engineer Intern for the Summer 2026 batch.
+
+Role: Systems Engineer Intern
+Location: Bengaluru / Pune
+Stipend: ₹25,000 per month
+Official Portal: https://www.infosys.com/careers/internships.html
+
+Important Security Advisory: Infosys does NOT request any fee, deposit, or payment at any stage of the recruitment process. All official communication is sent exclusively from official @infosys.com email addresses.
+
+Please review the attached formal offer letter and confirm your acceptance on the Infosys Launchpad portal within 7 business days.
+
+Warm regards,
+Global Talent Acquisition
+Infosys Limited
+careers@infosys.com`
+    };
+
+    function loadSample(key) {
+      if (samples[key]) {
+        const input = document.getElementById('noticeInput');
+        input.value = samples[key];
+        if (window.Motion && animate) {
+          animate(input, { scale: [0.995, 1], backgroundColor: ['#f5f5f4', '#fcfcfb'] }, { duration: 0.3 });
+        }
+        runVerification();
+      }
+    }
+
+    function clearInput() {
+      document.getElementById('noticeInput').value = '';
+    }
+
+    function handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          document.getElementById('noticeInput').value = e.target.result;
+          runVerification();
+        };
+        reader.readAsText(file);
+      }
+    }
+
+    // Motion.dev: Smooth Hover & Mobile-Safe Drag/Tap Interaction
+    function initInteractiveMotion() {
+      // 1. Hover interactions on desktop
+      const hoverTargets = document.querySelectorAll('.metric-box, #btnExecute');
+      hoverTargets.forEach(el => {
+        el.addEventListener('mouseenter', () => {
+          if (window.Motion && animate && window.matchMedia('(hover: hover)').matches) {
+            animate(el, { y: -2, scale: 1.015 }, { duration: 0.18, easing: 'ease-out' });
+          }
+        });
+        el.addEventListener('mouseleave', () => {
+          if (window.Motion && animate && window.matchMedia('(hover: hover)').matches) {
+            animate(el, { y: 0, scale: 1 }, { duration: 0.22, easing: 'ease-out' });
+          }
+        });
+      });
+
+      // 2. Drag & Tap Interaction for Reference Sample Chips
+      const chips = document.querySelectorAll('.draggable-chip');
+      const dropZone = document.getElementById('dropZoneContainer');
+
+      chips.forEach(chip => {
+        let isDragging = false;
+        let startX = 0;
+        let startY = 0;
+        let currentX = 0;
+        let currentY = 0;
+        let hasMoved = false;
+
+        chip.addEventListener('pointerdown', (e) => {
+          // If touch event, don't capture pointer immediately so normal scrolling works
+          startX = e.clientX;
+          startY = e.clientY;
+          hasMoved = false;
+          isDragging = true;
+        });
+
+        chip.addEventListener('pointermove', (e) => {
+          if (!isDragging) return;
+          const dx = e.clientX - startX;
+          const dy = e.clientY - startY;
+
+          // Require movement threshold before considering it an intentional drag
+          if (Math.hypot(dx, dy) > 8) {
+            if (!hasMoved) {
+              hasMoved = true;
+              chip.setPointerCapture(e.pointerId);
+              chip.style.zIndex = '100';
+              chip.style.position = 'relative';
+            }
+            currentX = dx;
+            currentY = dy;
+            chip.style.transform = `translate3d(${dx}px, ${dy}px, 0)`;
+
+            if (dropZone) {
+              const rect = dropZone.getBoundingClientRect();
+              if (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom) {
+                dropZone.classList.add('drop-active');
+              } else {
+                dropZone.classList.remove('drop-active');
+              }
+            }
+          }
+        });
+
+        const endDrag = (e) => {
+          if (!isDragging) return;
+          isDragging = false;
+          const sampleKey = chip.getAttribute('data-sample');
+
+          if (hasMoved) {
+            try { chip.releasePointerCapture(e.pointerId); } catch(err) {}
+
+            let droppedInTarget = false;
+            if (dropZone) {
+              const rect = dropZone.getBoundingClientRect();
+              if (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom) {
+                droppedInTarget = true;
+              }
+              dropZone.classList.remove('drop-active');
+            }
+
+            if (droppedInTarget) {
+              loadSample(sampleKey);
+              if (window.Motion && animate) {
+                animate(chip, { x: [currentX, 0], y: [currentY, 0], scale: [1.05, 1] }, { duration: 0.35, easing: spring({ stiffness: 350, damping: 25 }) });
+              } else {
+                chip.style.transform = 'translate3d(0, 0, 0)';
+              }
+            } else {
+              if (window.Motion && animate) {
+                animate(chip, { x: [currentX, 0], y: [currentY, 0] }, { duration: 0.3, easing: spring({ stiffness: 400, damping: 28 }) });
+              } else {
+                chip.style.transform = 'translate3d(0, 0, 0)';
+              }
+            }
+          } else {
+            // Clean Click / Tap
+            loadSample(sampleKey);
+            chip.style.transform = 'translate3d(0, 0, 0)';
+          }
+
+          chip.style.zIndex = '';
+        };
+
+        chip.addEventListener('pointerup', endDrag);
+        chip.addEventListener('pointercancel', endDrag);
+      });
+    }
+
+    // Heuristics Engine
+    const KNOWN_FIRMS = {
+      "microsoft": "microsoft.com",
+      "google": "google.com",
+      "amazon": "amazon.jobs",
+      "infosys": "infosys.com",
+      "tcs": "tcs.com",
+      "wipro": "wipro.com",
+      "accenture": "accenture.com",
+      "meta": "meta.com"
+    };
+
+    const FREE_PROVIDERS = ["gmail.com", "yahoo.com", "outlook.com", "hotmail.com", "rediffmail.com", "protonmail.com"];
+    const SUSPICIOUS_TLDS = [".xyz", ".top", ".tk", ".ml", ".ga", ".cf", ".gq", ".work", ".buzz", ".live", ".fit", ".icu"];
+
+    function runVerification() {
+      const text = document.getElementById('noticeInput').value.trim();
+      if (!text) {
+        return;
+      }
+
+      const lower = text.toLowerCase();
+      const findings = [];
+      let deductions = 0;
+      let violations = 0;
+
+      // Extract Entities
+      const emails = text.match(/[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+/g) || [];
+      const urls = text.match(/https?:\/\/[^\s<>"]+/g) || [];
+      const companies = [];
+      for (const comp in KNOWN_FIRMS) {
+        if (new RegExp('\\b' + comp + '\\b', 'i').test(text)) {
+          companies.push(comp.charAt(0).toUpperCase() + comp.slice(1));
+        }
+      }
+
+      // Rule 1: Advance Fee Demands (FIN-01)
+      const feeRegex = /(?:security|registration|training|kit|laptop|application)\s*(?:deposit|fee|charge|amount)|(?:pay|deposit|transfer|send)\s*(?:rs\.?|inr|₹|\$)\s*[\d,]+|refundable\s*(?:deposit|fee)/i;
+      if (feeRegex.test(lower)) {
+        deductions += 45;
+        violations += 1;
+        findings.push({
+          ruleId: "FIN-01",
+          status: "FAIL",
+          category: "Advance Payment Demand",
+          detail: "Demands upfront payment for equipment, registration, or refundable training deposits.",
+          rationale: "Enterprise recruitment standard: verified employers never require candidates to remit funds for hardware or onboarding."
+        });
+      } else {
+        findings.push({
+          ruleId: "FIN-01",
+          status: "PASS",
+          category: "Advance Payment Policy",
+          detail: "No financial demands or deposit requests detected.",
+          rationale: "Complies with standard zero-fee hiring protocols."
+        });
+      }
+
+      // Rule 2: Email Host Integrity (IDN-02)
+      if (emails.length > 0) {
+        emails.forEach(em => {
+          const dom = em.split('@')[1].toLowerCase();
+          if (FREE_PROVIDERS.includes(dom)) {
+            deductions += 30;
+            violations += 1;
+            findings.push({
+              ruleId: "IDN-02",
+              status: "FAIL",
+              category: "Sender Domain Integrity",
+              detail: `Sender utilizes public webmail host (${em}).`,
+              rationale: "Organizational recruiters communicate strictly via validated corporate domain infrastructure."
+            });
+          } else {
+            findings.push({
+              ruleId: "IDN-02",
+              status: "PASS",
+              category: "Sender Domain Integrity",
+              detail: `Institutional domain utilized (${em}).`,
+              rationale: "Matches expected corporate routing pattern."
+            });
+          }
+        });
+      } else {
+        findings.push({
+          ruleId: "IDN-02",
+          status: "WARN",
+          category: "Sender Domain Integrity",
+          detail: "No formal contact email parsed in payload.",
+          rationale: "Requires verification through official external channels."
+        });
+      }
+
+      // Rule 3: Destination Domain Reputation (NET-03)
+      if (urls.length > 0) {
+        urls.forEach(u => {
+          const uLow = u.toLowerCase();
+          const hasBadTld = SUSPICIOUS_TLDS.some(t => uLow.includes(t));
+          const isTemp = uLow.includes("temp") || uLow.includes("free");
+          if (hasBadTld || isTemp) {
+            deductions += 25;
+            violations += 1;
+            findings.push({
+              ruleId: "NET-03",
+              status: "FAIL",
+              category: "Destination Domain Integrity",
+              detail: `External link utilizes unverified or temporary top-level domain (${u}).`,
+              rationale: "Untrusted domains carry significant credential harvesting and payload delivery risks."
+            });
+          } else {
+            findings.push({
+              ruleId: "NET-03",
+              status: "PASS",
+              category: "Destination Domain Integrity",
+              detail: `Destination URL passed non-standard TLD check (${u}).`,
+              rationale: "Standard domain format observed."
+            });
+          }
+        });
+      }
+
+      // Rule 4: Process Integrity (PROC-04)
+      const directSelect = /(?:direct\s*selection|no\s*interview|without\s*interview)/i.test(lower);
+      if (directSelect) {
+        deductions += 20;
+        violations += 1;
+        findings.push({
+          ruleId: "PROC-04",
+          status: "FAIL",
+          category: "Assessment Process Integrity",
+          detail: "Offer extended without candidate technical evaluation or interview stage.",
+          rationale: "Direct employment shortcuts are a structural indicator of advance-fee schemes."
+        });
+      } else {
+        findings.push({
+          ruleId: "PROC-04",
+          status: "PASS",
+          category: "Assessment Process Integrity",
+          detail: "No bypassed evaluation claims detected.",
+          rationale: "Standard hiring screening implied."
+        });
+      }
+
+      // Rule 5: Channel Auditing (CHAN-05)
+      const socialOnly = /(?:whatsapp|telegram)\s*(?:only|directly)/i.test(lower) || /t\.me\//i.test(lower);
+      if (socialOnly) {
+        deductions += 15;
+        violations += 1;
+        findings.push({
+          ruleId: "CHAN-05",
+          status: "FAIL",
+          category: "Communication Channel Auditing",
+          detail: "Directs applicant interaction exclusively via unmonitored messaging services.",
+          rationale: "Bypasses enterprise audit logs and prevents corporate entity tracking."
+        });
+      }
+
+      // Calculate Score
+      let score = Math.max(0, Math.min(100, 100 - deductions));
+      if (violations >= 2) score = Math.min(score, 30);
+
+      // Render Outputs
+      const riskScoreEl = document.getElementById('riskScore');
+      const classificationEl = document.getElementById('classification');
+      const violationsEl = document.getElementById('violationsCount');
+      const claimedEntityEl = document.getElementById('claimedEntity');
+      const summaryMsg = document.getElementById('summaryMessage');
+      const actionProtocol = document.getElementById('actionProtocol');
+
+      riskScoreEl.innerText = `${score}/100`;
+      violationsEl.innerText = violations;
+      claimedEntityEl.innerText = companies.length > 0 ? companies[0] : 'Independent / Unlisted';
+
+      if (score <= 35) {
+        riskScoreEl.className = 'text-lg sm:text-2xl font-bold font-mono text-rose-700 mt-0.5 sm:mt-1';
+        classificationEl.innerText = 'High Risk (Flagged)';
+        classificationEl.className = 'text-xs sm:text-sm font-semibold text-rose-700 mt-1 sm:mt-1.5 truncate';
+        summaryMsg.innerHTML = '<span class="text-rose-700 font-semibold">Critical Threat Signature:</span> Multiple critical heuristic violations identified. High probability of fraudulent solicitation.';
+        actionProtocol.innerHTML = '<strong>Do not remit funds or transmit identity credentials.</strong> Report this communication immediately to your institutional placement directorate or national cyber fraud authorities.';
+      } else if (score <= 70) {
+        riskScoreEl.className = 'text-lg sm:text-2xl font-bold font-mono text-amber-700 mt-0.5 sm:mt-1';
+        classificationEl.innerText = 'Suspicious (Caution)';
+        classificationEl.className = 'text-xs sm:text-sm font-semibold text-amber-700 mt-1 sm:mt-1.5 truncate';
+        summaryMsg.innerHTML = '<span class="text-amber-700 font-semibold">Anomalies Detected:</span> Unverified domain routing or missing identity credentials observed.';
+        actionProtocol.innerHTML = 'Cross-verify the recruiter profile via corporate directory listings or the primary enterprise careers portal prior to proceeding.';
+      } else {
+        riskScoreEl.className = 'text-lg sm:text-2xl font-bold font-mono text-emerald-700 mt-0.5 sm:mt-1';
+        classificationEl.innerText = 'Standard Protocol';
+        classificationEl.className = 'text-xs sm:text-sm font-semibold text-emerald-700 mt-1 sm:mt-1.5 truncate';
+        summaryMsg.innerHTML = '<span class="text-emerald-700 font-semibold">Standard Signals:</span> No heuristic triggers or advance payment signatures identified in payload.';
+        actionProtocol.innerHTML = 'Standard recruitment communication observed. Proceed according to institutional placement cell guidelines.';
+      }
+
+      // Render Findings
+      const container = document.getElementById('findingsContainer');
+      container.innerHTML = '';
+      document.getElementById('findingsCount').innerText = `${findings.length} evaluated`;
+
+      const createdItems = [];
+      findings.forEach(f => {
+        let badgeStyle = 'bg-emerald-50 text-emerald-700 border border-emerald-200';
+        if (f.status === 'FAIL') badgeStyle = 'bg-rose-50 text-rose-700 border border-rose-200';
+        else if (f.status === 'WARN') badgeStyle = 'bg-amber-50 text-amber-700 border border-amber-200';
+
+        const item = document.createElement('div');
+        item.className = 'finding-item p-3 sm:p-3.5 rounded-md bg-stone-50 border border-stone-200/80 text-xs sm:text-sm shadow-sm';
+        item.innerHTML = `
+          <div class="flex flex-col xs:flex-row xs:items-center justify-between gap-1 mb-1">
+            <span class="font-semibold text-stone-900 text-xs sm:text-sm">
+              <span class="font-mono text-stone-400 mr-1 font-normal">[${f.ruleId}]</span>
+              ${f.category}
+            </span>
+            <span class="self-start xs:self-auto px-1.5 py-0.5 rounded text-[10px] sm:text-xs font-mono font-semibold ${badgeStyle}">${f.status}</span>
+          </div>
+          <p class="text-stone-700 mb-1 leading-relaxed">${f.detail}</p>
+          <p class="text-stone-500 text-[11px] sm:text-xs leading-relaxed font-mono">${f.rationale}</p>
+        `;
+        container.appendChild(item);
+        createdItems.push(item);
+      });
+
+      // Layout animation via Motion.dev for generated findings
+      if (window.Motion && animate && stagger && createdItems.length > 0) {
+        animate(createdItems, { opacity: [0, 1], y: [10, 0] }, { delay: stagger(0.04), duration: 0.25, easing: 'ease-out' });
+      }
+
+      lucide.createIcons();
+    }
+
+    // Initialize Interactive Motion on Page Load
+    window.addEventListener('DOMContentLoaded', () => {
+      initInteractiveMotion();
+    });
+  </script>
+</body>
+</html>
