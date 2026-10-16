@@ -58,7 +58,7 @@
         </div>
         <div class="flex items-center gap-1.5 sm:gap-2">
           <span class="text-sm sm:text-base font-semibold tracking-tight text-stone-900">ProofLens</span>
-          <span class="text-[10px] sm:text-xs px-1.5 py-0.5 rounded bg-stone-100 text-stone-600 border border-stone-200 font-mono font-medium hidden xs:inline">v1.0</span>
+          <span class="text-[10px] sm:text-xs px-1.5 py-0.5 rounded bg-stone-100 text-stone-600 border border-stone-200 font-mono font-medium hidden xs:inline">v1.1 AI-Hybrid</span>
         </div>
       </div>
       
@@ -87,7 +87,7 @@
         Opportunity Verification & Heuristic Threat Analysis
       </h1>
       <p class="text-xs sm:text-base text-stone-600 mt-1.5 sm:mt-2 max-w-3xl leading-relaxed">
-        ProofLens evaluates recruitment letters, internship notices, and academic communications against advance payment demands, domain impersonation patterns, and unmonitored communication routes.
+        ProofLens evaluates recruitment letters, internship notices, and academic communications against deterministic security heuristics and modular LLM semantic threat inspection.
       </p>
 
       <!-- Reference Samples for Testing (Mobile native carousel + desktop wrap) -->
@@ -122,6 +122,42 @@
       
       <!-- Input Panel (5 Cols) -->
       <div class="lg:col-span-5 flex flex-col gap-4">
+
+        <!-- Modular AI Engine Configuration Card -->
+        <div class="bg-white border border-stone-200/90 rounded-lg p-3.5 sm:p-4 shadow-sm space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <i data-lucide="cpu" class="w-4 h-4 text-stone-600"></i>
+              <span class="text-xs sm:text-sm font-semibold uppercase tracking-wider text-stone-700">Modular AI Threat Layer</span>
+            </div>
+            <label class="inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="aiToggle" class="sr-only peer" checked onchange="toggleAIConfig()">
+              <div class="w-9 h-5 bg-stone-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all relative peer-checked:bg-stone-900"></div>
+            </label>
+          </div>
+
+          <div id="aiConfigBody" class="space-y-2.5 pt-1 border-t border-stone-100">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div>
+                <label for="aiProvider" class="block text-[11px] font-mono text-stone-500 mb-1">MODEL ADAPTER</label>
+                <select id="aiProvider" class="w-full bg-[#fcfcfb] border border-stone-200 rounded px-2.5 py-1.5 text-xs text-stone-800 font-medium focus:outline-none focus:border-stone-400">
+                  <option value="gemini">Gemini 2.5 Flash (Multimodal)</option>
+                  <option value="groq">Groq — Llama 3.3 70B</option>
+                  <option value="openai">OpenAI — GPT-4o-mini</option>
+                </select>
+              </div>
+              <div>
+                <label for="aiApiKey" class="block text-[11px] font-mono text-stone-500 mb-1">IN-MEMORY API KEY</label>
+                <input type="password" id="aiApiKey" placeholder="Paste provider key..." class="w-full bg-[#fcfcfb] border border-stone-200 rounded px-2.5 py-1.5 text-xs text-stone-800 font-mono focus:outline-none focus:border-stone-400" />
+              </div>
+            </div>
+            <p class="text-[11px] text-stone-400 leading-normal font-mono">
+              Keys execute strictly in-memory in your browser. If blank, engine falls back to deterministic heuristics.
+            </p>
+          </div>
+        </div>
+
+        <!-- Input Payload Card -->
         <div id="dropZoneContainer" class="bg-white border border-stone-200/90 rounded-lg p-3.5 sm:p-5 shadow-sm flex flex-col transition-colors duration-200">
           <div class="flex items-center justify-between mb-2">
             <label for="noticeInput" class="text-xs sm:text-sm font-semibold uppercase tracking-wider text-stone-600">
@@ -130,25 +166,34 @@
             <button onclick="clearInput()" class="text-xs sm:text-sm text-stone-400 hover:text-stone-700 transition p-1">Clear</button>
           </div>
 
-          <textarea id="noticeInput" rows="10" class="w-full bg-[#fcfcfb] border border-stone-200 rounded-md p-3 sm:p-3.5 text-stone-900 text-sm sm:text-base focus:outline-none focus:border-stone-400 resize-none font-mono leading-relaxed transition" placeholder="Paste communication body, email headers, or offer text for verification..."></textarea>
+          <textarea id="noticeInput" rows="9" class="w-full bg-[#fcfcfb] border border-stone-200 rounded-md p-3 sm:p-3.5 text-stone-900 text-sm sm:text-base focus:outline-none focus:border-stone-400 resize-none font-mono leading-relaxed transition" placeholder="Paste communication body, email headers, or offer text for verification..."></textarea>
+
+          <!-- Attached Image Preview Badge (Hidden unless screenshot uploaded) -->
+          <div id="imageAttachmentBar" class="hidden mt-2.5 px-3 py-2 rounded bg-stone-100 border border-stone-200 flex items-center justify-between text-xs text-stone-700 font-mono">
+            <div class="flex items-center gap-2 truncate">
+              <i data-lucide="image" class="w-3.5 h-3.5 text-stone-500 flex-shrink-0"></i>
+              <span id="imageAttachmentName" class="truncate">offer_screenshot.png</span>
+            </div>
+            <button onclick="clearImageAttachment()" class="text-stone-400 hover:text-stone-800 ml-2">Remove</button>
+          </div>
 
           <div class="mt-3.5 pt-3 border-t border-stone-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <label class="cursor-pointer text-xs sm:text-sm text-stone-600 hover:text-stone-900 flex items-center gap-1.5 transition py-1">
               <i data-lucide="file-up" class="w-4 h-4 flex-shrink-0"></i>
-              <span>Upload Plain Text (.txt)</span>
-              <input type="file" id="fileUpload" accept=".txt,.log,.md" class="hidden" onchange="handleFileUpload(event)">
+              <span>Upload Text or Offer Screenshot</span>
+              <input type="file" id="fileUpload" accept=".txt,.log,.md,.png,.jpg,.jpeg,.webp" class="hidden" onchange="handleFileUpload(event)">
             </label>
             <button id="btnExecute" onclick="runVerification()" class="w-full sm:w-auto px-4 py-2.5 bg-stone-900 hover:bg-stone-800 text-white font-medium text-xs sm:text-sm rounded-md transition flex items-center justify-center gap-2 shadow-sm active:scale-95">
               <i data-lucide="play" class="w-3.5 h-3.5"></i>
-              <span>Execute Analysis</span>
+              <span id="btnExecuteLabel">Execute Analysis</span>
             </button>
           </div>
         </div>
 
         <div class="p-3.5 sm:p-4 bg-stone-100/70 border border-stone-200/70 rounded-lg text-xs sm:text-sm text-stone-600 space-y-1">
-          <div class="font-semibold text-stone-800">Technical Scope</div>
+          <div class="font-semibold text-stone-800">Hybrid Technical Scope</div>
           <p class="leading-relaxed">
-            Evaluates advance fee demands, free mail hosts, domain spoofing indicators, non-interview selection claims, and unmonitored communication routes.
+            Layer 1 evaluates deterministic rules (FIN-01 to CHAN-05). Layer 2 dispatches the payload to the modular AI adapter (LLM-06) to inspect semantic manipulation, pretexting, and visual offer screenshots.
           </p>
         </div>
       </div>
@@ -159,9 +204,9 @@
         <!-- Metrics Row (2 cols on small phone, 4 on desktop) -->
         <div id="metricsRow" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
           <div class="metric-box bg-white border border-stone-200/90 rounded-lg p-3 sm:p-3.5 shadow-sm transition">
-            <span class="text-[11px] sm:text-xs font-medium text-stone-400 uppercase tracking-wider block">Risk Rating</span>
+            <span class="text-[11px] sm:text-xs font-medium text-stone-400 uppercase tracking-wider block">Trust Score</span>
             <div id="riskScore" class="text-lg sm:text-2xl font-bold font-mono text-stone-700 mt-0.5 sm:mt-1">Pending</div>
-            <span class="text-[10px] sm:text-xs text-stone-400">Heuristic Score</span>
+            <span id="engineModeLabel" class="text-[10px] sm:text-xs text-stone-400">Heuristic Score</span>
           </div>
 
           <div class="metric-box bg-white border border-stone-200/90 rounded-lg p-3 sm:p-3.5 shadow-sm transition">
@@ -186,17 +231,17 @@
         <!-- Summary Note -->
         <div id="summaryNote" class="p-3 sm:p-3.5 bg-white border border-stone-200/80 rounded-lg text-xs sm:text-sm text-stone-700 shadow-sm flex items-start gap-2.5 sm:gap-3">
           <i data-lucide="terminal" class="w-4 h-4 text-stone-500 flex-shrink-0 mt-0.5"></i>
-          <span id="summaryMessage" class="leading-relaxed">Ready. Load a reference sample or supply text in the input area to inspect heuristics.</span>
+          <span id="summaryMessage" class="leading-relaxed">Ready. Load a reference sample, paste text, or upload a screenshot to inspect heuristics.</span>
         </div>
 
         <!-- Evidence Breakdown Table -->
         <div class="bg-white border border-stone-200/90 rounded-lg shadow-sm overflow-hidden">
           <div class="px-4 sm:px-5 py-3 border-b border-stone-100 flex items-center justify-between">
-            <span class="text-xs sm:text-sm font-semibold uppercase tracking-wider text-stone-700">Heuristic Audit Findings</span>
+            <span class="text-xs sm:text-sm font-semibold uppercase tracking-wider text-stone-700">Heuristic & AI Audit Findings</span>
             <span id="findingsCount" class="text-xs sm:text-sm font-mono text-stone-500">0 findings</span>
           </div>
 
-          <div id="findingsContainer" class="p-3 sm:p-4 space-y-2.5 max-h-[380px] overflow-y-auto">
+          <div id="findingsContainer" class="p-3 sm:p-4 space-y-2.5 max-h-[420px] overflow-y-auto">
             <div class="text-center py-8 sm:py-10 text-xs sm:text-sm text-stone-400 font-mono">
               Awaiting data input.
             </div>
@@ -220,7 +265,7 @@
   <div id="view-methodology" class="hidden flex-1 max-w-4xl w-full mx-auto px-3.5 sm:px-6 py-6 sm:py-8 flex flex-col gap-5 sm:gap-6">
     <div class="border-b border-stone-200 pb-3.5 sm:pb-4">
       <h2 class="text-lg sm:text-2xl font-semibold text-stone-900 tracking-tight">Technical Methodology & Heuristics</h2>
-      <p class="text-xs sm:text-sm text-stone-500 mt-1">ProofLens operates on deterministic rule heuristics rather than probabilistic generative estimation.</p>
+      <p class="text-xs sm:text-sm text-stone-500 mt-1">ProofLens combines deterministic rule heuristics with a plug-and-play AI semantic inspection adapter.</p>
     </div>
 
     <div class="space-y-3.5 sm:space-y-4 text-xs sm:text-sm text-stone-700 leading-relaxed">
@@ -251,6 +296,13 @@
           Evaluates offers extended without formal skills assessment, coding examinations, or interviews. Authentic technical roles enforce structured evaluation procedures.
         </p>
       </div>
+
+      <div class="bg-white border border-stone-200/80 rounded-lg p-3.5 sm:p-4 shadow-sm space-y-1">
+        <h3 class="font-semibold text-stone-900 text-sm sm:text-base">5. Modular AI Semantic & Visual Inspection (Rule ID: LLM-06)</h3>
+        <p class="text-stone-600 leading-relaxed">
+          Utilizes a plug-and-play model adapter (`AIModelAdapter`) compatible with Gemini 2.5 Flash, Groq Llama-3.3, and OpenAI to detect contextual social engineering, psychological urgency, and fraudulent offer screenshots that evade static regex patterns.
+        </p>
+      </div>
     </div>
   </div>
 
@@ -266,21 +318,21 @@
       <div class="bg-white border border-stone-200/80 rounded-lg p-3.5 sm:p-4 shadow-sm space-y-1">
         <h3 class="font-semibold text-stone-900 text-sm sm:text-base">1. Zero Persistent Data Retention</h3>
         <p class="text-stone-600 leading-relaxed">
-          ProofLens processes submitted text and uploaded documents entirely in-memory within your active browser session. No pasted communications, email headers, extracted names, or personal identifying data (PII) are stored on disk, written to remote databases, or logged to remote servers.
+          ProofLens processes submitted text and uploaded documents entirely in-memory within your active browser session. No pasted communications, email headers, extracted names, API keys, or personal identifying data (PII) are stored on disk or written to remote databases.
         </p>
       </div>
 
       <div class="bg-white border border-stone-200/80 rounded-lg p-3.5 sm:p-4 shadow-sm space-y-1">
-        <h3 class="font-semibold text-stone-900 text-sm sm:text-base">2. Client-Side Execution</h3>
+        <h3 class="font-semibold text-stone-900 text-sm sm:text-base">2. Client-Side & Ephemeral Execution</h3>
         <p class="text-stone-600 leading-relaxed">
-          The heuristic verification algorithms execute locally in your client environment. No network requests containing your input payload are dispatched to third-party tracking services or advertising entities.
+          Deterministic heuristic algorithms execute locally in your client environment. When the optional AI Deep Inspection layer is enabled with a user-supplied key, the payload is transmitted directly over TLS to the selected model endpoint for ephemeral inference.
         </p>
       </div>
 
       <div class="bg-white border border-stone-200/80 rounded-lg p-3.5 sm:p-4 shadow-sm space-y-1">
         <h3 class="font-semibold text-stone-900 text-sm sm:text-base">3. No Training on User Data</h3>
         <p class="text-stone-600 leading-relaxed">
-          Your submitted notices and confidential offer documents are never harvested, aggregated, or utilized to train external machine learning models or commercial classifiers.
+          Your submitted notices and confidential offer documents are never harvested, aggregated, or utilized by ProofLens to train external machine learning models or commercial classifiers.
         </p>
       </div>
 
@@ -313,7 +365,7 @@
       <div class="bg-white border border-stone-200/80 rounded-lg p-3.5 sm:p-4 shadow-sm space-y-1">
         <h3 class="font-semibold text-stone-900 text-sm sm:text-base">1. Nature of the Utility</h3>
         <p class="text-stone-600 leading-relaxed">
-          ProofLens is an analytical, evidence-based threat detection and verification system. It evaluates communications against heuristic rules to assist users in identifying fraudulent recruitment and advance-fee solicitation schemes.
+          ProofLens is an analytical, evidence-based threat detection and verification system. It evaluates communications against heuristic rules and semantic models to assist users in identifying fraudulent recruitment and advance-fee solicitation schemes.
         </p>
       </div>
 
@@ -378,6 +430,17 @@
 
     // Setup Motion.dev integrations
     const { animate, spring, stagger } = window.Motion || {};
+
+    // Ephemeral state for attached image screenshot
+    let attachedImageBase64 = null;
+    let attachedImageMime = 'image/png';
+
+    function toggleAIConfig() {
+      const enabled = document.getElementById('aiToggle').checked;
+      const body = document.getElementById('aiConfigBody');
+      body.style.opacity = enabled ? '1' : '0.45';
+      body.style.pointerEvents = enabled ? 'auto' : 'none';
+    }
 
     // Layout Transition via Motion.dev
     function switchView(viewName) {
@@ -475,6 +538,7 @@ careers@infosys.com`
 
     function loadSample(key) {
       if (samples[key]) {
+        clearImageAttachment();
         const input = document.getElementById('noticeInput');
         input.value = samples[key];
         if (window.Motion && animate) {
@@ -486,11 +550,34 @@ careers@infosys.com`
 
     function clearInput() {
       document.getElementById('noticeInput').value = '';
+      clearImageAttachment();
+    }
+
+    function clearImageAttachment() {
+      attachedImageBase64 = null;
+      attachedImageMime = 'image/png';
+      document.getElementById('imageAttachmentBar').classList.add('hidden');
+      document.getElementById('fileUpload').value = '';
     }
 
     function handleFileUpload(event) {
       const file = event.target.files[0];
-      if (file) {
+      if (!file) return;
+
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const dataUrl = e.target.result;
+          attachedImageBase64 = dataUrl.split(',')[1];
+          attachedImageMime = file.type || 'image/png';
+          document.getElementById('imageAttachmentName').innerText = file.name;
+          document.getElementById('imageAttachmentBar').classList.remove('hidden');
+          lucide.createIcons();
+          runVerification();
+        };
+        reader.readAsDataURL(file);
+      } else {
+        clearImageAttachment();
         const reader = new FileReader();
         reader.onload = (e) => {
           document.getElementById('noticeInput').value = e.target.result;
@@ -500,117 +587,106 @@ careers@infosys.com`
       }
     }
 
-    // Motion.dev: Smooth Hover & Mobile-Safe Drag/Tap Interaction
-    function initInteractiveMotion() {
-      // 1. Hover interactions on desktop
-      const hoverTargets = document.querySelectorAll('.metric-box, #btnExecute');
-      hoverTargets.forEach(el => {
-        el.addEventListener('mouseenter', () => {
-          if (window.Motion && animate && window.matchMedia('(hover: hover)').matches) {
-            animate(el, { y: -2, scale: 1.015 }, { duration: 0.18, easing: 'ease-out' });
-          }
-        });
-        el.addEventListener('mouseleave', () => {
-          if (window.Motion && animate && window.matchMedia('(hover: hover)').matches) {
-            animate(el, { y: 0, scale: 1 }, { duration: 0.22, easing: 'ease-out' });
-          }
-        });
-      });
+    // ============================================================================
+    // MODULAR PLUG-AND-PLAY AI ADAPTER (Layer 2)
+    // ============================================================================
+    const AIModelAdapter = {
+      systemPrompt: `You are ProofLens AI, a cybersecurity threat intelligence engine specializing in academic and employment communications.
+Inspect the provided communication payload (and optional screenshot image) for:
+1. Subtle advance-fee or deposit pretexts (equipment, coding tests, training certificates, refundable tokens).
+2. Brand impersonation, domain spoofing, or lookalike URLs.
+3. High-pressure urgency tactics or bypassed technical interviews.
 
-      // 2. Drag & Tap Interaction for Reference Sample Chips
-      const chips = document.querySelectorAll('.draggable-chip');
-      const dropZone = document.getElementById('dropZoneContainer');
-
-      chips.forEach(chip => {
-        let isDragging = false;
-        let startX = 0;
-        let startY = 0;
-        let currentX = 0;
-        let currentY = 0;
-        let hasMoved = false;
-
-        chip.addEventListener('pointerdown', (e) => {
-          // If touch event, don't capture pointer immediately so normal scrolling works
-          startX = e.clientX;
-          startY = e.clientY;
-          hasMoved = false;
-          isDragging = true;
-        });
-
-        chip.addEventListener('pointermove', (e) => {
-          if (!isDragging) return;
-          const dx = e.clientX - startX;
-          const dy = e.clientY - startY;
-
-          // Require movement threshold before considering it an intentional drag
-          if (Math.hypot(dx, dy) > 8) {
-            if (!hasMoved) {
-              hasMoved = true;
-              chip.setPointerCapture(e.pointerId);
-              chip.style.zIndex = '100';
-              chip.style.position = 'relative';
-            }
-            currentX = dx;
-            currentY = dy;
-            chip.style.transform = `translate3d(${dx}px, ${dy}px, 0)`;
-
-            if (dropZone) {
-              const rect = dropZone.getBoundingClientRect();
-              if (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom) {
-                dropZone.classList.add('drop-active');
-              } else {
-                dropZone.classList.remove('drop-active');
-              }
-            }
-          }
-        });
-
-        const endDrag = (e) => {
-          if (!isDragging) return;
-          isDragging = false;
-          const sampleKey = chip.getAttribute('data-sample');
-
-          if (hasMoved) {
-            try { chip.releasePointerCapture(e.pointerId); } catch(err) {}
-
-            let droppedInTarget = false;
-            if (dropZone) {
-              const rect = dropZone.getBoundingClientRect();
-              if (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom) {
-                droppedInTarget = true;
-              }
-              dropZone.classList.remove('drop-active');
-            }
-
-            if (droppedInTarget) {
-              loadSample(sampleKey);
-              if (window.Motion && animate) {
-                animate(chip, { x: [currentX, 0], y: [currentY, 0], scale: [1.05, 1] }, { duration: 0.35, easing: spring({ stiffness: 350, damping: 25 }) });
-              } else {
-                chip.style.transform = 'translate3d(0, 0, 0)';
-              }
-            } else {
-              if (window.Motion && animate) {
-                animate(chip, { x: [currentX, 0], y: [currentY, 0] }, { duration: 0.3, easing: spring({ stiffness: 400, damping: 28 }) });
-              } else {
-                chip.style.transform = 'translate3d(0, 0, 0)';
-              }
-            }
-          } else {
-            // Clean Click / Tap
-            loadSample(sampleKey);
-            chip.style.transform = 'translate3d(0, 0, 0)';
-          }
-
-          chip.style.zIndex = '';
-        };
-
-        chip.addEventListener('pointerup', endDrag);
-        chip.addEventListener('pointercancel', endDrag);
-      });
+Return STRICTLY valid JSON matching this exact schema:
+{
+  "ai_risk_deduction": <integer 0 to 50>,
+  "ai_violations": <integer 0 to 3>,
+  "claimed_company": "<detected organization name or empty string>",
+  "extracted_text": "<if image provided, full OCR text from image, else empty string>",
+  "ai_summary": "<1 concise objective technical sentence summarizing the AI assessment>",
+  "ai_findings": [
+    {
+      "ruleId": "LLM-06",
+      "status": "FAIL" | "WARN" | "PASS",
+      "category": "<short category name, e.g. Semantic Pretext Analysis>",
+      "detail": "<concise finding based on specific evidence in the payload>",
+      "rationale": "<security protocol rationale>"
     }
+  ]
+}`,
 
-    // Heuristics Engine
+      async inspect({ provider, apiKey, text, imageBase64, imageMime }) {
+        const userPrompt = `Inspect this recruitment communication payload:\n\n${text || '[Image Payload Attached]'}`;
+
+        if (provider === 'gemini') {
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
+          const parts = [{ text: `${this.systemPrompt}\n\n${userPrompt}` }];
+          if (imageBase64) {
+            parts.push({
+              inlineData: {
+                mimeType: imageMime,
+                data: imageBase64
+              }
+            });
+          }
+
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts }],
+              generationConfig: {
+                temperature: 0.1,
+                responseMimeType: 'application/json'
+              }
+            })
+          });
+
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err?.error?.message || `Gemini HTTP ${res.status}`);
+          }
+          const data = await res.json();
+          const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+          return JSON.parse(raw);
+        }
+
+        // OpenAI-Compatible Adapter (Groq & OpenAI)
+        const endpoint = provider === 'groq'
+          ? 'https://api.groq.com/openai/v1/chat/completions'
+          : 'https://api.openai.com/v1/chat/completions';
+        const model = provider === 'groq' ? 'llama-3.3-70b-versatile' : 'gpt-4o-mini';
+
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+          },
+          body: JSON.stringify({
+            model,
+            temperature: 0.1,
+            response_format: { type: 'json_object' },
+            messages: [
+              { role: 'system', content: this.systemPrompt },
+              { role: 'user', content: userPrompt }
+            ]
+          })
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err?.error?.message || `${provider.toUpperCase()} HTTP ${res.status}`);
+        }
+        const data = await res.json();
+        const raw = data?.choices?.[0]?.message?.content || '{}';
+        return JSON.parse(raw);
+      }
+    };
+
+    // ============================================================================
+    // DETERMINISTIC HEURISTICS + HYBRID RUNNER
+    // ============================================================================
     const KNOWN_FIRMS = {
       "microsoft": "microsoft.com",
       "google": "google.com",
@@ -619,16 +695,53 @@ careers@infosys.com`
       "tcs": "tcs.com",
       "wipro": "wipro.com",
       "accenture": "accenture.com",
-      "meta": "meta.com"
+      "meta": "meta.com",
+      "apple": "apple.com",
+      "ibm": "ibm.com",
+      "cognizant": "cognizant.com",
+      "capgemini": "capgemini.com",
+      "adobe": "adobe.com",
+      "oracle": "oracle.com"
     };
 
     const FREE_PROVIDERS = ["gmail.com", "yahoo.com", "outlook.com", "hotmail.com", "rediffmail.com", "protonmail.com"];
     const SUSPICIOUS_TLDS = [".xyz", ".top", ".tk", ".ml", ".ga", ".cf", ".gq", ".work", ".buzz", ".live", ".fit", ".icu"];
 
-    function runVerification() {
-      const text = document.getElementById('noticeInput').value.trim();
-      if (!text) {
+    async function runVerification() {
+      let text = document.getElementById('noticeInput').value.trim();
+      const aiEnabled = document.getElementById('aiToggle').checked;
+      const aiProvider = document.getElementById('aiProvider').value;
+      const aiApiKey = document.getElementById('aiApiKey').value.trim();
+
+      if (!text && !attachedImageBase64) {
         return;
+      }
+
+      const btn = document.getElementById('btnExecute');
+      const btnLabel = document.getElementById('btnExecuteLabel');
+      btn.disabled = true;
+      btnLabel.innerText = (aiEnabled && aiApiKey) ? 'Inspecting (Hybrid AI)...' : 'Executing...';
+
+      let aiOutput = null;
+      let aiError = null;
+
+      // If an image is uploaded and AI is active, run AI first so OCR text can also feed deterministic rules
+      if (aiEnabled && aiApiKey) {
+        try {
+          aiOutput = await AIModelAdapter.inspect({
+            provider: aiProvider,
+            apiKey: aiApiKey,
+            text,
+            imageBase64: attachedImageBase64,
+            imageMime: attachedImageMime
+          });
+          if (!text && aiOutput?.extracted_text) {
+            text = aiOutput.extracted_text;
+            document.getElementById('noticeInput').value = text;
+          }
+        } catch (err) {
+          aiError = err.message || 'AI provider request failed';
+        }
       }
 
       const lower = text.toLowerCase();
@@ -766,12 +879,45 @@ careers@infosys.com`
         });
       }
 
-      // Calculate Score
+      // Rule 6: Merge Modular AI Findings (LLM-06)
+      if (aiOutput) {
+        const aiDed = Math.max(0, Math.min(50, Number(aiOutput.ai_risk_deduction) || 0));
+        const aiViol = Math.max(0, Math.min(3, Number(aiOutput.ai_violations) || 0));
+        deductions += aiDed;
+        violations += aiViol;
+
+        if (companies.length === 0 && aiOutput.claimed_company) {
+          companies.push(aiOutput.claimed_company);
+        }
+
+        if (Array.isArray(aiOutput.ai_findings)) {
+          aiOutput.ai_findings.forEach(af => {
+            findings.unshift({
+              ruleId: af.ruleId || "LLM-06",
+              status: ["FAIL", "WARN", "PASS"].includes(af.status) ? af.status : "WARN",
+              category: `AI Engine — ${af.category || 'Semantic Inspection'}`,
+              detail: af.detail || "Evaluated via LLM semantic analysis.",
+              rationale: af.rationale || "Contextual verification layer."
+            });
+          });
+        }
+      } else if (aiError) {
+        findings.unshift({
+          ruleId: "LLM-06",
+          status: "WARN",
+          category: "AI Engine Notice",
+          detail: `AI inspection skipped (${aiError}). Showing deterministic heuristic results.`,
+          rationale: "Verify API key configuration in the Modular AI Threat Layer panel."
+        });
+      }
+
+      // Calculate Final Score
       let score = Math.max(0, Math.min(100, 100 - deductions));
       if (violations >= 2) score = Math.min(score, 30);
 
       // Render Outputs
       const riskScoreEl = document.getElementById('riskScore');
+      const engineModeLabel = document.getElementById('engineModeLabel');
       const classificationEl = document.getElementById('classification');
       const violationsEl = document.getElementById('violationsCount');
       const claimedEntityEl = document.getElementById('claimedEntity');
@@ -779,26 +925,31 @@ careers@infosys.com`
       const actionProtocol = document.getElementById('actionProtocol');
 
       riskScoreEl.innerText = `${score}/100`;
+      engineModeLabel.innerText = aiOutput ? `Hybrid (${aiProvider.toUpperCase()} + Rules)` : 'Deterministic Score';
       violationsEl.innerText = violations;
       claimedEntityEl.innerText = companies.length > 0 ? companies[0] : 'Independent / Unlisted';
+
+      const aiSynthesisSuffix = aiOutput?.ai_summary
+        ? ` <span class="block mt-1 font-mono text-xs text-stone-500">[AI Synthesis: ${aiOutput.ai_summary}]</span>`
+        : '';
 
       if (score <= 35) {
         riskScoreEl.className = 'text-lg sm:text-2xl font-bold font-mono text-rose-700 mt-0.5 sm:mt-1';
         classificationEl.innerText = 'High Risk (Flagged)';
         classificationEl.className = 'text-xs sm:text-sm font-semibold text-rose-700 mt-1 sm:mt-1.5 truncate';
-        summaryMsg.innerHTML = '<span class="text-rose-700 font-semibold">Critical Threat Signature:</span> Multiple critical heuristic violations identified. High probability of fraudulent solicitation.';
+        summaryMsg.innerHTML = `<span class="text-rose-700 font-semibold">Critical Threat Signature:</span> Multiple critical violations identified. High probability of fraudulent solicitation.${aiSynthesisSuffix}`;
         actionProtocol.innerHTML = '<strong>Do not remit funds or transmit identity credentials.</strong> Report this communication immediately to your institutional placement directorate or national cyber fraud authorities.';
       } else if (score <= 70) {
         riskScoreEl.className = 'text-lg sm:text-2xl font-bold font-mono text-amber-700 mt-0.5 sm:mt-1';
         classificationEl.innerText = 'Suspicious (Caution)';
         classificationEl.className = 'text-xs sm:text-sm font-semibold text-amber-700 mt-1 sm:mt-1.5 truncate';
-        summaryMsg.innerHTML = '<span class="text-amber-700 font-semibold">Anomalies Detected:</span> Unverified domain routing or missing identity credentials observed.';
+        summaryMsg.innerHTML = `<span class="text-amber-700 font-semibold">Anomalies Detected:</span> Unverified domain routing or missing identity credentials observed.${aiSynthesisSuffix}`;
         actionProtocol.innerHTML = 'Cross-verify the recruiter profile via corporate directory listings or the primary enterprise careers portal prior to proceeding.';
       } else {
         riskScoreEl.className = 'text-lg sm:text-2xl font-bold font-mono text-emerald-700 mt-0.5 sm:mt-1';
         classificationEl.innerText = 'Standard Protocol';
         classificationEl.className = 'text-xs sm:text-sm font-semibold text-emerald-700 mt-1 sm:mt-1.5 truncate';
-        summaryMsg.innerHTML = '<span class="text-emerald-700 font-semibold">Standard Signals:</span> No heuristic triggers or advance payment signatures identified in payload.';
+        summaryMsg.innerHTML = `<span class="text-emerald-700 font-semibold">Standard Signals:</span> No heuristic triggers or advance payment signatures identified in payload.${aiSynthesisSuffix}`;
         actionProtocol.innerHTML = 'Standard recruitment communication observed. Proceed according to institutional placement cell guidelines.';
       }
 
@@ -835,13 +986,72 @@ careers@infosys.com`
         animate(createdItems, { opacity: [0, 1], y: [10, 0] }, { delay: stagger(0.04), duration: 0.25, easing: 'ease-out' });
       }
 
+      btn.disabled = false;
+      btnLabel.innerText = 'Execute Analysis';
       lucide.createIcons();
     }
 
-    // Initialize Interactive Motion on Page Load
-    window.addEventListener('DOMContentLoaded', () => {
-      initInteractiveMotion();
-    });
-  </script>
-</body>
-</html>
+    // Motion.dev: Smooth Hover & Mobile-Safe Drag/Tap Interaction
+    function initInteractiveMotion() {
+      const hoverTargets = document.querySelectorAll('.metric-box, #btnExecute');
+      hoverTargets.forEach(el => {
+        el.addEventListener('mouseenter', () => {
+          if (window.Motion && animate && window.matchMedia('(hover: hover)').matches) {
+            animate(el, { y: -2, scale: 1.015 }, { duration: 0.18, easing: 'ease-out' });
+          }
+        });
+        el.addEventListener('mouseleave', () => {
+          if (window.Motion && animate && window.matchMedia('(hover: hover)').matches) {
+            animate(el, { y: 0, scale: 1 }, { duration: 0.22, easing: 'ease-out' });
+          }
+        });
+      });
+
+      const chips = document.querySelectorAll('.draggable-chip');
+      const dropZone = document.getElementById('dropZoneContainer');
+
+      chips.forEach(chip => {
+        let isDragging = false;
+        let startX = 0;
+        let startY = 0;
+        let currentX = 0;
+        let currentY = 0;
+        let hasMoved = false;
+
+        chip.addEventListener('pointerdown', (e) => {
+          startX = e.clientX;
+          startY = e.clientY;
+          hasMoved = false;
+          isDragging = true;
+        });
+
+        chip.addEventListener('pointermove', (e) => {
+          if (!isDragging) return;
+          const dx = e.clientX - startX;
+          const dy = e.clientY - startY;
+
+          if (Math.hypot(dx, dy) > 8) {
+            if (!hasMoved) {
+              hasMoved = true;
+              chip.setPointerCapture(e.pointerId);
+              chip.style.zIndex = '100';
+              chip.style.position = 'relative';
+            }
+            currentX = dx;
+            currentY = dy;
+            chip.style.transform = `translate3d(${dx}px, ${dy}px, 0)`;
+
+            if (dropZone) {
+              const rect = dropZone.getBoundingClientRect();
+              if (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom) {
+                dropZone.classList.add('drop-active');
+              } else {
+                dropZone.classList.remove('drop-active');
+              }
+            }
+          }
+        });
+
+        const endDrag = (e) => {
+          if (!isDragging) return;
+          isDragging = false;
