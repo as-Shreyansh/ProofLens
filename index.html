@@ -62,7 +62,7 @@
         </div>
       </div>
       
-      <!-- Nav Tabs (Horizontally scrollable with zero layout breakage on mobile) -->
+      <!-- Nav Tabs -->
       <nav class="flex items-center gap-1 sm:gap-2 overflow-x-auto no-scrollbar py-1">
         <button onclick="switchView('scanner')" id="nav-scanner" class="px-2.5 sm:px-3.5 py-1.5 rounded-md text-xs sm:text-sm font-medium text-stone-900 bg-stone-100 border border-stone-200 whitespace-nowrap flex-shrink-0 transition">Scanner</button>
         <button onclick="switchView('methodology')" id="nav-methodology" class="px-2.5 sm:px-3.5 py-1.5 rounded-md text-xs sm:text-sm font-medium text-stone-600 hover:text-stone-900 whitespace-nowrap flex-shrink-0 transition">Methodology</button>
@@ -90,7 +90,7 @@
         ProofLens evaluates recruitment letters, internship notices, and academic communications against deterministic security heuristics and modular LLM semantic threat inspection.
       </p>
 
-      <!-- Reference Samples for Testing (Mobile native carousel + desktop wrap) -->
+      <!-- Reference Samples for Testing -->
       <div class="mt-4 sm:mt-5 pt-3.5 sm:pt-4 border-t border-stone-200/70">
         <div class="flex items-center justify-between mb-2">
           <span class="text-xs sm:text-sm text-stone-500 font-medium">Reference Samples:</span>
@@ -168,7 +168,7 @@
 
           <textarea id="noticeInput" rows="9" class="w-full bg-[#fcfcfb] border border-stone-200 rounded-md p-3 sm:p-3.5 text-stone-900 text-sm sm:text-base focus:outline-none focus:border-stone-400 resize-none font-mono leading-relaxed transition" placeholder="Paste communication body, email headers, or offer text for verification..."></textarea>
 
-          <!-- Attached Image Preview Badge (Hidden unless screenshot uploaded) -->
+          <!-- Attached Image Preview Badge -->
           <div id="imageAttachmentBar" class="hidden mt-2.5 px-3 py-2 rounded bg-stone-100 border border-stone-200 flex items-center justify-between text-xs text-stone-700 font-mono">
             <div class="flex items-center gap-2 truncate">
               <i data-lucide="image" class="w-3.5 h-3.5 text-stone-500 flex-shrink-0"></i>
@@ -201,7 +201,7 @@
       <!-- Results Panel (7 Cols) -->
       <div class="lg:col-span-7 flex flex-col gap-4">
         
-        <!-- Metrics Row (2 cols on small phone, 4 on desktop) -->
+        <!-- Metrics Row -->
         <div id="metricsRow" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
           <div class="metric-box bg-white border border-stone-200/90 rounded-lg p-3 sm:p-3.5 shadow-sm transition">
             <span class="text-[11px] sm:text-xs font-medium text-stone-400 uppercase tracking-wider block">Trust Score</span>
@@ -300,7 +300,7 @@
       <div class="bg-white border border-stone-200/80 rounded-lg p-3.5 sm:p-4 shadow-sm space-y-1">
         <h3 class="font-semibold text-stone-900 text-sm sm:text-base">5. Modular AI Semantic & Visual Inspection (Rule ID: LLM-06)</h3>
         <p class="text-stone-600 leading-relaxed">
-          Utilizes a plug-and-play model adapter (`AIModelAdapter`) compatible with Gemini 2.5 Flash, Groq Llama-3.3, and OpenAI to detect contextual social engineering, psychological urgency, and fraudulent offer screenshots that evade static regex patterns.
+          Utilizes a plug-and-play model adapter compatible with Gemini 2.5 Flash, Groq Llama-3.3, and OpenAI to detect contextual social engineering, psychological urgency, and fraudulent offer screenshots that evade static regex patterns.
         </p>
       </div>
     </div>
@@ -314,7 +314,6 @@
     </div>
 
     <div class="space-y-3.5 sm:space-y-4 text-xs sm:text-sm text-stone-700 leading-relaxed">
-      
       <div class="bg-white border border-stone-200/80 rounded-lg p-3.5 sm:p-4 shadow-sm space-y-1">
         <h3 class="font-semibold text-stone-900 text-sm sm:text-base">1. Zero Persistent Data Retention</h3>
         <p class="text-stone-600 leading-relaxed">
@@ -335,21 +334,6 @@
           Your submitted notices and confidential offer documents are never harvested, aggregated, or utilized by ProofLens to train external machine learning models or commercial classifiers.
         </p>
       </div>
-
-      <div class="bg-white border border-stone-200/80 rounded-lg p-3.5 sm:p-4 shadow-sm space-y-1">
-        <h3 class="font-semibold text-stone-900 text-sm sm:text-base">4. Telemetry and Analytics</h3>
-        <p class="text-stone-600 leading-relaxed">
-          This deployment contains zero third-party tracking cookies, user profiling beacons, or advertising telemetry scripts.
-        </p>
-      </div>
-
-      <div class="bg-white border border-stone-200/80 rounded-lg p-3.5 sm:p-4 shadow-sm space-y-1">
-        <h3 class="font-semibold text-stone-900 text-sm sm:text-base">5. Responsible Disclosure</h3>
-        <p class="text-stone-600 leading-relaxed">
-          ProofLens is a security utility intended to detect unauthorized solicitation and credential fraud. If you identify vulnerabilities or evasion techniques within the heuristic ruleset, submit technical reports via the project repository.
-        </p>
-      </div>
-
     </div>
   </div>
 
@@ -361,49 +345,12 @@
     </div>
 
     <div class="space-y-3.5 sm:space-y-4 text-xs sm:text-sm text-stone-700 leading-relaxed">
-      
       <div class="bg-white border border-stone-200/80 rounded-lg p-3.5 sm:p-4 shadow-sm space-y-1">
         <h3 class="font-semibold text-stone-900 text-sm sm:text-base">1. Nature of the Utility</h3>
         <p class="text-stone-600 leading-relaxed">
           ProofLens is an analytical, evidence-based threat detection and verification system. It evaluates communications against heuristic rules and semantic models to assist users in identifying fraudulent recruitment and advance-fee solicitation schemes.
         </p>
       </div>
-
-      <div class="bg-white border border-stone-200/80 rounded-lg p-3.5 sm:p-4 shadow-sm space-y-1">
-        <h3 class="font-semibold text-stone-900 text-sm sm:text-base">2. Non-Advisory & Informational Purpose</h3>
-        <p class="text-stone-600 leading-relaxed">
-          The diagnostic results, risk scores, and recommendations generated by ProofLens are provided solely for general informational and threat-awareness purposes. ProofLens does not provide legal, financial, or formal employment advice. Users are required to independently verify any communication directly through official corporate career portals or university Training & Placement authorities.
-        </p>
-      </div>
-
-      <div class="bg-white border border-stone-200/80 rounded-lg p-3.5 sm:p-4 shadow-sm space-y-1">
-        <h3 class="font-semibold text-stone-900 text-sm sm:text-base">3. Permitted & Acceptable Use</h3>
-        <p class="text-stone-600 leading-relaxed">
-          You agree to utilize ProofLens exclusively for lawful purposes, such as analyzing suspicious emails, notices, or offers received by you or your academic institution. You agree not to attempt to disrupt, denial-of-service, or systematically exploit the verification endpoints.
-        </p>
-      </div>
-
-      <div class="bg-white border border-stone-200/80 rounded-lg p-3.5 sm:p-4 shadow-sm space-y-1">
-        <h3 class="font-semibold text-stone-900 text-sm sm:text-base">4. Nominative Use of Corporate Names</h3>
-        <p class="text-stone-600 leading-relaxed">
-          References to corporate names, brand names, or trademarks (such as Microsoft, Google, Infosys, etc.) within the tool are used strictly in a nominative capacity to identify, report, and analyze impersonation patterns. ProofLens is not affiliated with, sponsored by, or endorsed by these third-party organizations.
-        </p>
-      </div>
-
-      <div class="bg-white border border-stone-200/80 rounded-lg p-3.5 sm:p-4 shadow-sm space-y-1">
-        <h3 class="font-semibold text-stone-900 text-sm sm:text-base">5. Limitation of Liability</h3>
-        <p class="text-stone-600 leading-relaxed">
-          ProofLens and its developers provide this platform on an "as is" and "as available" basis without warranties of any kind. Under no circumstances shall ProofLens be liable for any direct, indirect, incidental, or consequential damages resulting from decisions made based on heuristic outputs.
-        </p>
-      </div>
-
-      <div class="bg-white border border-stone-200/80 rounded-lg p-3.5 sm:p-4 shadow-sm space-y-1">
-        <h3 class="font-semibold text-stone-900 text-sm sm:text-base">6. Amendments</h3>
-        <p class="text-stone-600 leading-relaxed">
-          These terms may be updated periodically to reflect changes in legal standards or security heuristic capabilities. Continued usage of the utility constitutes acceptance of the current terms.
-        </p>
-      </div>
-
     </div>
   </div>
 
@@ -428,10 +375,8 @@
   <script>
     lucide.createIcons();
 
-    // Setup Motion.dev integrations
     const { animate, spring, stagger } = window.Motion || {};
 
-    // Ephemeral state for attached image screenshot
     let attachedImageBase64 = null;
     let attachedImageMime = 'image/png';
 
@@ -442,7 +387,6 @@
       body.style.pointerEvents = enabled ? 'auto' : 'none';
     }
 
-    // Layout Transition via Motion.dev
     function switchView(viewName) {
       const views = ['view-scanner', 'view-methodology', 'view-privacy', 'view-terms'];
       const navIds = ['nav-scanner', 'nav-methodology', 'nav-privacy', 'nav-terms'];
@@ -474,66 +418,11 @@
       lucide.createIcons();
     }
 
-    // Reference Samples
     const samples = {
-      scam1: `Dear Student,
-
-Congratulations! We are pleased to inform you that you have been shortlisted for the position of Software Development Intern at Microsoft India.
-
-Stipend: ₹45,000 per month
-Duration: 6 Months (Work from home)
-Selection Mode: Direct selection based on your profile (No interview required).
-
-Please note: To receive your company-issued ThinkPad laptop, welcome kit, and security access token, you are required to deposit a 100% refundable security amount of ₹2,499 via UPI to hr.microsoft.onboarding@upi within 3 hours.
-
-This fee will be refunded with your first month stipend. Failure to deposit within 3 hours will result in immediate cancellation of your offer.
-
-For queries contact: hr.microsoft.recruiters2026@gmail.com
-Regards,
-Recruitment Cell, Microsoft India`,
-
-      scam2: `URGENT HIRING!! Earn ₹2000 - ₹5000 daily from home!
-
-Part-time online data entry & typing job.
-No qualifications, no skills needed. Students eligible.
-Guaranteed payment every evening.
-
-Limited seats available! Hurry, offer expires today!
-To start immediately, do NOT email. Send a direct WhatsApp message to +919876543210 or join our Telegram channel at t.me/fast_income_jobs.
-
-Registration charge of ₹499 required for software activation key.`,
-
-      startup: `Hi there,
-
-We came across your profile and would like to invite you for an internship role in Frontend Development at NexaGen Digital Labs.
-
-Stipend: ₹12,000 / month
-Location: Remote
-Timeline: 3 months
-
-Please fill in your project portfolio and submit your GitHub link at http://nexagen-careers.temp-site.xyz/apply.
-Selected candidates will go through a 30-minute technical interview with our engineering lead.
-
-If you have questions, reach out to contact@nexagendigital.com.
-Note: Offer closes this Friday.`,
-
-      legit: `Dear Candidate,
-
-Following your technical and HR interview rounds, Infosys Ltd. is pleased to extend an offer for the position of Systems Engineer Intern for the Summer 2026 batch.
-
-Role: Systems Engineer Intern
-Location: Bengaluru / Pune
-Stipend: ₹25,000 per month
-Official Portal: https://www.infosys.com/careers/internships.html
-
-Important Security Advisory: Infosys does NOT request any fee, deposit, or payment at any stage of the recruitment process. All official communication is sent exclusively from official @infosys.com email addresses.
-
-Please review the attached formal offer letter and confirm your acceptance on the Infosys Launchpad portal within 7 business days.
-
-Warm regards,
-Global Talent Acquisition
-Infosys Limited
-careers@infosys.com`
+      scam1: `Dear Student,\n\nCongratulations! We are pleased to inform you that you have been shortlisted for the position of Software Development Intern at Microsoft India.\n\nStipend: ₹45,000 per month\nDuration: 6 Months (Work from home)\nSelection Mode: Direct selection based on your profile (No interview required).\n\nPlease note: To receive your company-issued ThinkPad laptop, welcome kit, and security access token, you are required to deposit a 100% refundable security amount of ₹2,499 via UPI to hr.microsoft.onboarding@upi within 3 hours.\n\nThis fee will be refunded with your first month stipend. Failure to deposit within 3 hours will result in immediate cancellation of your offer.\n\nFor queries contact: hr.microsoft.recruiters2026@gmail.com\nRegards,\nRecruitment Cell, Microsoft India`,
+      scam2: `URGENT HIRING!! Earn ₹2000 - ₹5000 daily from home!\n\nPart-time online data entry & typing job.\nNo qualifications, no skills needed. Students eligible.\nGuaranteed payment every evening.\n\nLimited seats available! Hurry, offer expires today!\nTo start immediately, do NOT email. Send a direct WhatsApp message to +919876543210 or join our Telegram channel at t.me/fast_income_jobs.\n\nRegistration charge of ₹499 required for software activation key.`,
+      startup: `Hi there,\n\nWe came across your profile and would like to invite you for an internship role in Frontend Development at NexaGen Digital Labs.\n\nStipend: ₹12,000 / month\nLocation: Remote\nTimeline: 3 months\n\nPlease fill in your project portfolio and submit your GitHub link at http://nexagen-careers.temp-site.xyz/apply.\nSelected candidates will go through a 30-minute technical interview with our engineering lead.\n\nIf you have questions, reach out to contact@nexagendigital.com.\nNote: Offer closes this Friday.`,
+      legit: `Dear Candidate,\n\nFollowing your technical and HR interview rounds, Infosys Ltd. is pleased to extend an offer for the position of Systems Engineer Intern for the Summer 2026 batch.\n\nRole: Systems Engineer Intern\nLocation: Bengaluru / Pune\nStipend: ₹25,000 per month\nOfficial Portal: https://www.infosys.com/careers/internships.html\n\nImportant Security Advisory: Infosys does NOT request any fee, deposit, or payment at any stage of the recruitment process. All official communication is sent exclusively from official @infosys.com email addresses.\n\nPlease review the attached formal offer letter and confirm your acceptance on the Infosys Launchpad portal within 7 business days.\n\nWarm regards,\nGlobal Talent Acquisition\nInfosys Limited\ncareers@infosys.com`
     };
 
     function loadSample(key) {
@@ -587,9 +476,6 @@ careers@infosys.com`
       }
     }
 
-    // ============================================================================
-    // MODULAR PLUG-AND-PLAY AI ADAPTER (Layer 2)
-    // ============================================================================
     const AIModelAdapter = {
       systemPrompt: `You are ProofLens AI, a cybersecurity threat intelligence engine specializing in academic and employment communications.
 Inspect the provided communication payload (and optional screenshot image) for:
@@ -608,8 +494,8 @@ Return STRICTLY valid JSON matching this exact schema:
     {
       "ruleId": "LLM-06",
       "status": "FAIL" | "WARN" | "PASS",
-      "category": "<short category name, e.g. Semantic Pretext Analysis>",
-      "detail": "<concise finding based on specific evidence in the payload>",
+      "category": "<short category name>",
+      "detail": "<concise finding based on evidence>",
       "rationale": "<security protocol rationale>"
     }
   ]
@@ -651,7 +537,6 @@ Return STRICTLY valid JSON matching this exact schema:
           return JSON.parse(raw);
         }
 
-        // OpenAI-Compatible Adapter (Groq & OpenAI)
         const endpoint = provider === 'groq'
           ? 'https://api.groq.com/openai/v1/chat/completions'
           : 'https://api.openai.com/v1/chat/completions';
@@ -684,9 +569,6 @@ Return STRICTLY valid JSON matching this exact schema:
       }
     };
 
-    // ============================================================================
-    // DETERMINISTIC HEURISTICS + HYBRID RUNNER
-    // ============================================================================
     const KNOWN_FIRMS = {
       "microsoft": "microsoft.com",
       "google": "google.com",
@@ -695,13 +577,7 @@ Return STRICTLY valid JSON matching this exact schema:
       "tcs": "tcs.com",
       "wipro": "wipro.com",
       "accenture": "accenture.com",
-      "meta": "meta.com",
-      "apple": "apple.com",
-      "ibm": "ibm.com",
-      "cognizant": "cognizant.com",
-      "capgemini": "capgemini.com",
-      "adobe": "adobe.com",
-      "oracle": "oracle.com"
+      "meta": "meta.com"
     };
 
     const FREE_PROVIDERS = ["gmail.com", "yahoo.com", "outlook.com", "hotmail.com", "rediffmail.com", "protonmail.com"];
@@ -713,9 +589,7 @@ Return STRICTLY valid JSON matching this exact schema:
       const aiProvider = document.getElementById('aiProvider').value;
       const aiApiKey = document.getElementById('aiApiKey').value.trim();
 
-      if (!text && !attachedImageBase64) {
-        return;
-      }
+      if (!text && !attachedImageBase64) return;
 
       const btn = document.getElementById('btnExecute');
       const btnLabel = document.getElementById('btnExecuteLabel');
@@ -725,7 +599,6 @@ Return STRICTLY valid JSON matching this exact schema:
       let aiOutput = null;
       let aiError = null;
 
-      // If an image is uploaded and AI is active, run AI first so OCR text can also feed deterministic rules
       if (aiEnabled && aiApiKey) {
         try {
           aiOutput = await AIModelAdapter.inspect({
@@ -740,7 +613,7 @@ Return STRICTLY valid JSON matching this exact schema:
             document.getElementById('noticeInput').value = text;
           }
         } catch (err) {
-          aiError = err.message || 'AI provider request failed';
+          aiError = err.message || 'AI request failed';
         }
       }
 
@@ -749,7 +622,6 @@ Return STRICTLY valid JSON matching this exact schema:
       let deductions = 0;
       let violations = 0;
 
-      // Extract Entities
       const emails = text.match(/[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+/g) || [];
       const urls = text.match(/https?:\/\/[^\s<>"]+/g) || [];
       const companies = [];
@@ -759,7 +631,6 @@ Return STRICTLY valid JSON matching this exact schema:
         }
       }
 
-      // Rule 1: Advance Fee Demands (FIN-01)
       const feeRegex = /(?:security|registration|training|kit|laptop|application)\s*(?:deposit|fee|charge|amount)|(?:pay|deposit|transfer|send)\s*(?:rs\.?|inr|₹|\$)\s*[\d,]+|refundable\s*(?:deposit|fee)/i;
       if (feeRegex.test(lower)) {
         deductions += 45;
@@ -781,7 +652,6 @@ Return STRICTLY valid JSON matching this exact schema:
         });
       }
 
-      // Rule 2: Email Host Integrity (IDN-02)
       if (emails.length > 0) {
         emails.forEach(em => {
           const dom = em.split('@')[1].toLowerCase();
@@ -815,7 +685,6 @@ Return STRICTLY valid JSON matching this exact schema:
         });
       }
 
-      // Rule 3: Destination Domain Reputation (NET-03)
       if (urls.length > 0) {
         urls.forEach(u => {
           const uLow = u.toLowerCase();
@@ -843,7 +712,6 @@ Return STRICTLY valid JSON matching this exact schema:
         });
       }
 
-      // Rule 4: Process Integrity (PROC-04)
       const directSelect = /(?:direct\s*selection|no\s*interview|without\s*interview)/i.test(lower);
       if (directSelect) {
         deductions += 20;
@@ -865,7 +733,6 @@ Return STRICTLY valid JSON matching this exact schema:
         });
       }
 
-      // Rule 5: Channel Auditing (CHAN-05)
       const socialOnly = /(?:whatsapp|telegram)\s*(?:only|directly)/i.test(lower) || /t\.me\//i.test(lower);
       if (socialOnly) {
         deductions += 15;
@@ -879,7 +746,6 @@ Return STRICTLY valid JSON matching this exact schema:
         });
       }
 
-      // Rule 6: Merge Modular AI Findings (LLM-06)
       if (aiOutput) {
         const aiDed = Math.max(0, Math.min(50, Number(aiOutput.ai_risk_deduction) || 0));
         const aiViol = Math.max(0, Math.min(3, Number(aiOutput.ai_violations) || 0));
@@ -911,11 +777,9 @@ Return STRICTLY valid JSON matching this exact schema:
         });
       }
 
-      // Calculate Final Score
       let score = Math.max(0, Math.min(100, 100 - deductions));
       if (violations >= 2) score = Math.min(score, 30);
 
-      // Render Outputs
       const riskScoreEl = document.getElementById('riskScore');
       const engineModeLabel = document.getElementById('engineModeLabel');
       const classificationEl = document.getElementById('classification');
@@ -953,7 +817,6 @@ Return STRICTLY valid JSON matching this exact schema:
         actionProtocol.innerHTML = 'Standard recruitment communication observed. Proceed according to institutional placement cell guidelines.';
       }
 
-      // Render Findings
       const container = document.getElementById('findingsContainer');
       container.innerHTML = '';
       document.getElementById('findingsCount').innerText = `${findings.length} evaluated`;
@@ -981,7 +844,6 @@ Return STRICTLY valid JSON matching this exact schema:
         createdItems.push(item);
       });
 
-      // Layout animation via Motion.dev for generated findings
       if (window.Motion && animate && stagger && createdItems.length > 0) {
         animate(createdItems, { opacity: [0, 1], y: [10, 0] }, { delay: stagger(0.04), duration: 0.25, easing: 'ease-out' });
       }
@@ -991,7 +853,6 @@ Return STRICTLY valid JSON matching this exact schema:
       lucide.createIcons();
     }
 
-    // Motion.dev: Smooth Hover & Mobile-Safe Drag/Tap Interaction
     function initInteractiveMotion() {
       const hoverTargets = document.querySelectorAll('.metric-box, #btnExecute');
       hoverTargets.forEach(el => {
@@ -1055,3 +916,50 @@ Return STRICTLY valid JSON matching this exact schema:
         const endDrag = (e) => {
           if (!isDragging) return;
           isDragging = false;
+          const sampleKey = chip.getAttribute('data-sample');
+
+          if (hasMoved) {
+            try { chip.releasePointerCapture(e.pointerId); } catch(err) {}
+
+            let droppedInTarget = false;
+            if (dropZone) {
+              const rect = dropZone.getBoundingClientRect();
+              if (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom) {
+                droppedInTarget = true;
+              }
+              dropZone.classList.remove('drop-active');
+            }
+
+            if (droppedInTarget) {
+              loadSample(sampleKey);
+              if (window.Motion && animate) {
+                animate(chip, { x: [currentX, 0], y: [currentY, 0], scale: [1.05, 1] }, { duration: 0.35, easing: spring({ stiffness: 350, damping: 25 }) });
+              } else {
+                chip.style.transform = 'translate3d(0, 0, 0)';
+              }
+            } else {
+              if (window.Motion && animate) {
+                animate(chip, { x: [currentX, 0], y: [currentY, 0] }, { duration: 0.3, easing: spring({ stiffness: 400, damping: 28 }) });
+              } else {
+                chip.style.transform = 'translate3d(0, 0, 0)';
+              }
+            }
+          } else {
+            loadSample(sampleKey);
+            chip.style.transform = 'translate3d(0, 0, 0)';
+          }
+
+          chip.style.zIndex = '';
+        };
+
+        chip.addEventListener('pointerup', endDrag);
+        chip.addEventListener('pointercancel', endDrag);
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initInteractiveMotion();
+    });
+  </script>
+</body>
+</html>
