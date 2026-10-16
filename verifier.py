@@ -3,8 +3,13 @@ ProofLens - Evidence-Based Claim & Opportunity Verification Engine
 Cybersecurity & Digital Trust Hackathon Project
 """
 
+import os
 import re
-from typing import Dict, List, Any
+import json
+import base64
+import urllib.request
+import urllib.error
+from typing import Dict, List, Any, Optional
 
 # Known legitimate corporate career domains vs free mail providers
 FREE_EMAIL_PROVIDERS = {
@@ -58,25 +63,169 @@ CONTACT_RED_FLAGS = [
     r"wa\.me/[0-9]+"
 ]
 
+
+class AIModelAdapter:
+    """
+    Modular, plug-and-play AI adapter.
+    Supports Gemini, Groq, and OpenAI via standard REST calls so models can be
+    swapped without rebuilding the verification pipeline.
+    """
+
+    SYSTEM_PROMPT = (
+        "You are ProofLens AI, a cybersecurity threat intelligence engine specializing in "
+        "academic and employment communications. Analyze the provided job/internship offer or "
+        "communication payload (and optional image) for social engineering, pretexting, "
+        "unrealistic compensation structures, linguistic manipulation, or brand impersonation.\n\n"
+        "Respond strictly in valid JSON matching this schema:\n"
+        "{\n"
+        '  "ai_risk_deduction": <int between 0 and 50>,\n'
+        '  "ai_red_flags": <int between 0 and 3>,\n'
+        '  "ai_summary": "<1-2 sentence objective technical synthesis>",\n'
+        '  "extracted_text_from_image": "<text if image provided, else empty string>",\n'
+        '  "ai_claims": [\n'
+        "    {\n"
+        '      "category": "<e.g., Semantic Manipulation | Compensation Anomaly | Pretexting>",\n'
+        '      "claim": "<concise description of the evaluated pattern>",\n'
+        '      "verdict": "<PASS | CAUTION | FAIL>",\n'
+        '      "status": "<verified | moderate_risk | high_risk>",\n'
+        '      "evidence": "<specific analytical evidence from the payload>",\n'
+        '      "action": "<recommended security protocol>"\n'
+        "    }\n"
+        "  ]\n"
+        "}"
+    )
+
+    @classmethod
+    def analyze(
+        cls,
+        provider: str,
+        api_key: str,
+        text: str,
+        entities: Dict[str, Any],
+        image_bytes: Optional[bytes] = None,
+        image_mime: str = "image/png"
+    ) -> Dict[str, Any]:
+        provider_key = provider.lower()
+        user_payload = (
+            f"Communication Payload:\n{text if text.strip() else '[See attached image]'}\n\n"
+            f"Pre-extracted Entities: {json.dumps(entities)}"
+        )
+
+        if "gemini" in provider_key:
+            return cls._call_gemini(api_key, user_payload, image_bytes, image_mime)
+        elif "groq" in provider_key:
+            return cls._call_openai_compatible(
+                url="https://api.groq.com/openai/v1/chat/completions",
+                model="llama-3.3-70b-versatile",
+                api_key=api_key,
+                user_payload=user_payload
+            )
+        elif "openai" in provider_key:
+            return cls._call_openai_compatible(
+                url="https://api.openai.com/v1/chat/completions",
+                model="gpt-4o-mini",
+                api_key=api_key,
+                user_payload=user_payload
+            )
+        else:
+            raise ValueError(f"Unsupported AI provider: {provider}")
+
+    @classmethod
+    def _call_gemini(
+        cls,
+        api_key: str,
+        user_payload: str,
+        image_bytes: Optional[bytes] = None,
+        image_mime: str = "image/png"
+    ) -> Dict[str, Any]:
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
+        parts: List[Dict[str, Any]] = [{"text": f"{cls.SYSTEM_PROMPT}\n\n{user_payload}"}]
+
+        if image_bytes:
+            parts.append({
+                "inlineData": {
+                    "mimeType": image_mime,
+                    "data": base64.b64encode(image_bytes).decode("utf-8")
+                }
+            })
+
+        payload = {
+            "contents": [{"parts": parts}],
+            "generationConfig": {
+                "temperature": 0.1,
+                "responseMimeType": "application/json"
+            }
+        }
+
+        req = urllib.request.Request(
+            url,
+            data=json.dumps(payload).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+            method="POST"
+        )
+        with urllib.request.urlopen(req, timeout=25) as response:
+            resp_data = json.loads(response.read().decode("utf-8"))
+            raw_text = resp_data["candidates"][0]["content"]["parts"][0]["text"]
+            return json.loads(raw_text)
+
+    @classmethod
+    def _call_openai_compatible(
+        cls,
+        url: str,
+        model: str,
+        api_key: str,
+        user_payload: str
+    ) -> Dict[str, Any]:
+        payload = {
+            "model": model,
+            "messages": [
+                {"role": "system", "content": cls.SYSTEM_PROMPT},
+                {"role": "user", "content": user_payload}
+            ],
+            "temperature": 0.1,
+            "response_format": {"type": "json_object"}
+        }
+
+        req = urllib.request.Request(
+            url,
+            data=json.dumps(payload).encode("utf-8"),
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {api_key}",
+                "User-Agent": "ProofLens-SecurityEngine/1.0"
+            },
+            method="POST"
+        )
+        with urllib.request.urlopen(req, timeout=25) as response:
+            resp_data = json.loads(response.read().decode("utf-8"))
+            raw_text = resp_data["choices"][0]["message"]["content"]
+            return json.loads(raw_text)
+
+
 class ProofVerifier:
-    def __init__(self):
-        pass
+    def __init__(
+        self,
+        use_ai: bool = False,
+        api_key: Optional[str] = None,
+        provider: str = "Gemini 2.5 Flash"
+    ):
+        self.use_ai = use_ai
+        self.provider = provider
+        self.api_key = (
+            api_key
+            or os.getenv("GEMINI_API_KEY")
+            or os.getenv("GROQ_API_KEY")
+            or os.getenv("OPENAI_API_KEY")
+            or ""
+        )
 
     def extract_entities(self, text: str) -> Dict[str, Any]:
         """Extract key entities from the notice text."""
-        # Find emails
         emails = re.findall(r'[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+', text)
-        
-        # Find URLs and domains
         urls = re.findall(r'https?://[^\s<>"]+|www\.[^\s<>"]+', text)
-        
-        # Find phone numbers
         phones = re.findall(r'(?:\+91[\-\s]?)?[6789]\d{9}', text)
-        
-        # Find monetary amounts
         money = re.findall(r'(?:₹|rs\.?|inr|\$)\s*[\d,]+(?:\.\d+)?', text, re.IGNORECASE)
 
-        # Detect mentioned company names
         found_companies = []
         lower_text = text.lower()
         for company in KNOWN_TECH_FIRMS.keys():
@@ -91,8 +240,40 @@ class ProofVerifier:
             "companies": found_companies
         }
 
-    def verify(self, text: str) -> Dict[str, Any]:
-        """Perform full evidence-based claim verification."""
+    def verify(
+        self,
+        text: str,
+        image_bytes: Optional[bytes] = None,
+        image_mime: str = "image/png"
+    ) -> Dict[str, Any]:
+        """Perform full evidence-based claim verification (Deterministic + Optional AI Layer)."""
+        ai_status = {
+            "enabled": self.use_ai,
+            "provider": self.provider,
+            "executed": False,
+            "summary": None,
+            "error": None
+        }
+        ai_result = None
+
+        # Pre-run AI if an image is uploaded without text so OCR text can feed into heuristics
+        if self.use_ai and self.api_key and image_bytes and not text.strip():
+            try:
+                ai_result = AIModelAdapter.analyze(
+                    provider=self.provider,
+                    api_key=self.api_key,
+                    text=text,
+                    entities={},
+                    image_bytes=image_bytes,
+                    image_mime=image_mime
+                )
+                ocr_text = ai_result.get("extracted_text_from_image", "")
+                if ocr_text:
+                    text = ocr_text
+                ai_status["executed"] = True
+            except Exception as e:
+                ai_status["error"] = str(e)
+
         entities = self.extract_entities(text)
         lower_text = text.lower()
         claims = []
@@ -106,7 +287,7 @@ class ProofVerifier:
             m = re.findall(pat, lower_text)
             if m:
                 fee_matches.extend(m)
-        
+
         if fee_matches:
             red_flags_count += 2
             score_deductions += 45
@@ -169,14 +350,13 @@ class ProofVerifier:
         if entities["companies"]:
             company_name = entities["companies"][0]
             official_domain = KNOWN_TECH_FIRMS.get(company_name.lower())
-            
-            # Check if text contains misleading URLs
+
             has_mismatch = False
             for url in entities["urls"]:
                 if official_domain and official_domain not in url.lower():
                     has_mismatch = True
                     break
-            
+
             if has_mismatch or (entities["emails"] and any(official_domain not in em for em in entities["emails"])):
                 score_deductions += 20
                 red_flags_count += 1
@@ -221,7 +401,7 @@ class ProofVerifier:
                         "claim": f"External link ({u})",
                         "verdict": "PASS",
                         "status": "verified",
-                        "evidence": f"URL does not contain known throwaway or suspicious TLD patterns.",
+                        "evidence": "URL does not contain known throwaway or suspicious TLD patterns.",
                         "action": "Check browser SSL padlock before submitting details."
                     })
 
@@ -231,7 +411,7 @@ class ProofVerifier:
             m = re.findall(pat, lower_text)
             if m:
                 process_flags.extend(m)
-        
+
         if process_flags:
             score_deductions += 20
             red_flags_count += 1
@@ -259,7 +439,7 @@ class ProofVerifier:
             m = re.findall(pat, lower_text)
             if m:
                 urgency_matches.extend(m)
-        
+
         if urgency_matches:
             score_deductions += 15
             claims.append({
@@ -277,7 +457,7 @@ class ProofVerifier:
             m = re.findall(pat, lower_text)
             if m:
                 contact_flags.extend(m)
-        
+
         if contact_flags:
             score_deductions += 15
             red_flags_count += 1
@@ -289,6 +469,41 @@ class ProofVerifier:
                 "evidence": "Recruitment redirected exclusively through Telegram or personal WhatsApp. Legitimate corporate recruitment happens via official applicant tracking systems (Workday, Greenhouse, Taleo) or corporate email.",
                 "action": "Never conduct official hiring or onboarding solely through anonymous messaging apps."
             })
+
+        # 7. Modular AI Deep Inspection Layer
+        if self.use_ai:
+            if not self.api_key:
+                ai_status["error"] = "API key not provided. Falling back to deterministic heuristics."
+            else:
+                try:
+                    if ai_result is None:
+                        ai_result = AIModelAdapter.analyze(
+                            provider=self.provider,
+                            api_key=self.api_key,
+                            text=text,
+                            entities=entities,
+                            image_bytes=image_bytes,
+                            image_mime=image_mime
+                        )
+                    ai_status["executed"] = True
+                    ai_status["summary"] = ai_result.get("ai_summary")
+
+                    ai_deduction = int(ai_result.get("ai_risk_deduction", 0))
+                    ai_flags = int(ai_result.get("ai_red_flags", 0))
+                    score_deductions += max(0, min(50, ai_deduction))
+                    red_flags_count += max(0, min(3, ai_flags))
+
+                    for ai_claim in ai_result.get("ai_claims", []):
+                        claims.append({
+                            "category": f"AI Threat Engine — {ai_claim.get('category', 'Contextual Analysis')}",
+                            "claim": ai_claim.get("claim", "Semantic pattern inspection"),
+                            "verdict": ai_claim.get("verdict", "CAUTION"),
+                            "status": ai_claim.get("status", "moderate_risk"),
+                            "evidence": ai_claim.get("evidence", "Identified by LLM semantic inspection."),
+                            "action": ai_claim.get("action", "Verify independently via official channels.")
+                        })
+                except Exception as e:
+                    ai_status["error"] = f"AI inspection failed ({e}). Showing deterministic heuristic results."
 
         # Compute Trust Score (0 to 100)
         trust_score = max(5, min(100, 100 - score_deductions))
@@ -308,6 +523,9 @@ class ProofVerifier:
             badge_color = "green"
             summary_statement = "No prominent scam patterns detected. The communication adheres to standard recruitment practices."
 
+        if ai_status.get("summary"):
+            summary_statement = f"{summary_statement} [AI Synthesis: {ai_status['summary']}]"
+
         return {
             "trust_score": trust_score,
             "overall_verdict": overall_verdict,
@@ -315,5 +533,6 @@ class ProofVerifier:
             "summary_statement": summary_statement,
             "red_flags_count": red_flags_count,
             "entities": entities,
-            "claims": claims
+            "claims": claims,
+            "ai_status": ai_status
         }
