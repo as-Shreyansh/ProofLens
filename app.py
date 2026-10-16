@@ -3,8 +3,9 @@ ProofLens — Opportunity Verification & Heuristic Threat Analysis
 Technical Security Engine for Academic & Employment Communications
 """
 
-import streamlit as st
+import os
 import json
+import streamlit as st
 from verifier import ProofVerifier
 from samples import SAMPLE_OFFERS
 
@@ -71,10 +72,10 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Navigation
+# Navigation & AI Engine Configuration
 with st.sidebar:
     st.subheader("ProofLens Console")
-    st.caption("Verification & Threat Analysis Engine | v1.0")
+    st.caption("Verification & Threat Analysis Engine | v1.1 AI-Hybrid")
     
     view_selection = st.radio(
         "Navigation",
@@ -89,8 +90,34 @@ with st.sidebar:
             "Load reference sample:",
             ["Select a sample..."] + list(SAMPLE_OFFERS.keys())
         )
+        
+        st.divider()
+        st.write("**AI Threat Engine (Modular)**")
+        enable_ai = st.toggle("Enable LLM Deep Inspection", value=True)
+        ai_provider = st.selectbox(
+            "Model Provider:",
+            ["Gemini 2.5 Flash", "Groq (Llama-3.3-70B)", "OpenAI (GPT-4o-mini)"],
+            disabled=not enable_ai
+        )
+        default_env_key = (
+            os.getenv("GEMINI_API_KEY")
+            or os.getenv("GROQ_API_KEY")
+            or os.getenv("OPENAI_API_KEY")
+            or ""
+        )
+        api_key_input = st.text_input(
+            "Provider API Key:",
+            value=default_env_key,
+            type="password",
+            placeholder="Paste API key or set via environment...",
+            disabled=not enable_ai,
+            help="Keys and payloads remain strictly in-memory per Zero Persistent Storage compliance."
+        )
     else:
         selected_preset = "Select a sample..."
+        enable_ai = False
+        ai_provider = "Gemini 2.5 Flash"
+        api_key_input = ""
 
     st.divider()
     st.caption("Custom Domain Deployment Ready")
@@ -103,12 +130,15 @@ if view_selection == "Threat Scanner":
             Opportunity Verification & Heuristic Threat Analysis
         </h2>
         <p style="margin: 0.35rem 0 0 0; color: #78716c; font-size: 0.875rem;">
-            Inspect communication payloads for advance fee demands, domain spoofing patterns, and unmonitored channel routing.
+            Inspect communication payloads for advance fee demands, domain spoofing patterns, unmonitored channel routing, and AI-detected semantic manipulation.
         </p>
     </div>
     """, unsafe_allow_html=True)
 
     col1, col2 = st.columns([5, 4])
+
+    image_bytes = None
+    image_mime = "image/png"
 
     with col1:
         st.write("##### Input Communication Payload")
@@ -123,40 +153,68 @@ if view_selection == "Threat Scanner":
             placeholder="Paste communication text or offer notice here..."
         )
         
-        file_up = st.file_uploader("Upload plain text payload (.txt, .log):", type=["txt", "log", "md"])
+        file_up = st.file_uploader(
+            "Upload payload (.txt, .log, .md) or Offer Screenshot (.png, .jpg):",
+            type=["txt", "log", "md", "png", "jpg", "jpeg"]
+        )
         if file_up is not None:
-            try:
-                notice_input = file_up.read().decode("utf-8")
-                st.info(f"Loaded payload from '{file_up.name}'.")
-            except Exception as e:
-                st.error(f"File decoding error: {e}")
+            file_name_lower = file_up.name.lower()
+            if file_name_lower.endswith((".png", ".jpg", ".jpeg")):
+                image_bytes = file_up.read()
+                image_mime = file_up.type or "image/png"
+                st.info(f"Loaded visual payload '{file_up.name}' for Gemini multimodal inspection.")
+            else:
+                try:
+                    notice_input = file_up.read().decode("utf-8")
+                    st.info(f"Loaded text payload from '{file_up.name}'.")
+                except Exception as e:
+                    st.error(f"File decoding error: {e}")
 
         execute_btn = st.button("Execute Verification", type="primary", use_container_width=True)
 
     with col2:
-        st.write("##### Security Heuristics Overview")
+        st.write("##### Hybrid Security Architecture")
         st.markdown("""
-        The engine applies deterministic rules to detect:
+        **Layer 1 — Deterministic Heuristics:**
         - **Advance Payment Requests:** Prohibits fee charges for kits, registration, or equipment.
         - **Domain Host Verification:** Enforces corporate domain matching for corporate identities.
         - **Selection Shortcuts:** Flags claims of direct hiring without technical screening.
         - **Channel Diversion:** Warns against recruitment limited exclusively to messaging apps.
+
+        **Layer 2 — Plug-and-Play AI Engine:**
+        - **Semantic Pretexting Detection:** Identifies psychological manipulation and social engineering.
+        - **Visual Offer Inspection:** Extracts and verifies claims from uploaded offer screenshots.
         """)
 
     # Execution Results
     if execute_btn or (notice_input.strip() and selected_preset != "Select a sample..."):
-        if not notice_input.strip():
-            st.warning("No input provided. Enter text or load a reference sample to execute analysis.")
+        if not notice_input.strip() and image_bytes is None:
+            st.warning("No input provided. Enter text, upload a screenshot, or load a reference sample to execute analysis.")
         else:
-            verifier = ProofVerifier()
-            result = verifier.verify(notice_input)
+            verifier = ProofVerifier(
+                use_ai=enable_ai,
+                api_key=api_key_input.strip(),
+                provider=ai_provider
+            )
+            with st.spinner("Executing deterministic heuristics and AI semantic analysis..."):
+                result = verifier.verify(
+                    notice_input,
+                    image_bytes=image_bytes,
+                    image_mime=image_mime
+                )
             
             st.divider()
             st.write("#### Verification Report")
+
+            ai_info = result.get("ai_status", {})
+            if ai_info.get("enabled") and ai_info.get("error"):
+                st.warning(f"AI Layer Notice: {ai_info['error']}")
+            elif ai_info.get("executed"):
+                st.caption(f"Hybrid Inspection Active — Verified via Deterministic Engine + {ai_info.get('provider')}")
             
             m1, m2, m3, m4 = st.columns(4)
             with m1:
-                st.metric("Risk Score", f"{result['trust_score']}/100")
+                st.metric("Trust Score", f"{result['trust_score']}/100")
             with m2:
                 st.metric("Assessed Status", result["overall_verdict"])
             with m3:
@@ -167,7 +225,7 @@ if view_selection == "Threat Scanner":
 
             st.write(f"**Analysis Summary:** {result['summary_statement']}")
 
-            st.write("##### Heuristic Findings")
+            st.write("##### Heuristic & AI Findings")
             for c in result["claims"]:
                 status_class = "status-pass" if c["verdict"] == "PASS" else ("status-fail" if c["verdict"] == "FAIL" else "status-warn")
                 tag_class = "tag-pass" if c["verdict"] == "PASS" else ("tag-fail" if c["verdict"] == "FAIL" else "tag-warn")
@@ -204,7 +262,7 @@ elif view_selection == "Heuristic Methodology":
             Heuristic Methodology & Threat Detection Framework
         </h2>
         <p style="margin: 0.35rem 0 0 0; color: #78716c; font-size: 0.875rem;">
-            Deterministic rule specifications implemented in the ProofLens analysis engine.
+            Deterministic rule specifications and modular LLM layer implemented in the ProofLens analysis engine.
         </p>
     </div>
     """, unsafe_allow_html=True)
@@ -225,6 +283,10 @@ elif view_selection == "Heuristic Methodology":
     ### 4. Process Integrity (Rule ID: PROC-04)
     - **Logic:** Flags offers that claim selection occurred without interviews, assessments, or screening.
     - **Rationale:** Unrealistic employment shortcuts are a primary characteristic of advance-fee recruitment schemes.
+
+    ### 5. Modular AI Semantic Inspection (Rule ID: LLM-05)
+    - **Logic:** Evaluates contextual coherence, social engineering pretexts, and multimodal offer images via a plug-and-play adapter (`AIModelAdapter`).
+    - **Rationale:** Catches sophisticated phishing messages that deliberately evade static keyword patterns.
     """)
 
 # VIEW 3: PRIVACY POLICY
