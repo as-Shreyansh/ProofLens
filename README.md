@@ -1,66 +1,24 @@
-# ProofLens — Opportunity Verification & Threat Analysis
+# ProofLens — Opportunity Verification & Heuristic Threat Analysis
 
-ProofLens is an evidence-based security utility designed to detect fraudulent recruitment schemes, unauthorized advance-fee demands, and domain impersonation within student and academic communications.
-
----
-
-## Technical Overview
-
-Fraudulent employment communications frequently exploit trusted brand names while redirecting applicants through unauthorized payment routes (e.g., registration deposits, training kit fees, laptop courier charges) and unmonitored channels (WhatsApp/Telegram).
-
-ProofLens evaluates communication payloads using deterministic heuristic rules across five threat vectors:
-1. **Advance Payment Demands (FIN-01):** Flags requests for candidate deposits, application fees, or training hardware charges.
-2. **Sender Domain Integrity (IDN-02):** Detects usage of free public webmail (Gmail, Yahoo, Outlook) by senders claiming corporate entity affiliations.
-3. **Destination Domain Reputation (NET-03):** Flags non-standard, disposable top-level domains (.xyz, .top, .work, .buzz) and temporary hosts.
-4. **Assessment Process Integrity (PROC-04):** Identifies anomalous selection claims issued without interview or technical evaluation stages.
-5. **Channel Auditing (CHAN-05):** Flags recruitment routed exclusively over unaudited messaging platforms.
+**ProofLens** is a technical security engine designed to inspect academic communications, internship notices, and employment offers for advance-fee scams, domain spoofing, unmonitored communication channels, and social engineering.
 
 ---
 
-## Interface & Usage
+## Architecture: Hybrid Verification Engine
 
-### 1. Standalone Web Dashboard
-A zero-dependency, mobile-responsive client interface is implemented in `index.html`. It executes entirely within the local browser environment without sending input payloads to remote backends. Features full smartphone touch support, horizontal swipeable sample carousels, responsive typography, and viewport-fit formatting.
-
-To inspect locally:
-```bash
-python -m http.server 8000
-```
-Open `http://localhost:8000` on desktop or your mobile device connected to the local network.
-
-### 2. Streamlit Console
-An interactive Python console is provided in `app.py`:
-```bash
-pip install -r requirements.txt
-streamlit run app.py
-```
+ProofLens operates on a robust **two-layer verification pipeline**:
+1. **Layer 1 (Deterministic Heuristics):** Instantly evaluates payloads against regex rule signatures (`FIN-01`, `IDN-02`, `NET-03`, `PROC-04`, `CHAN-05`) for instantaneous, reliable threat detection.
+2. **Layer 2 (Modular AI Threat Layer / LLM-06):** Optional plug-and-play adapter supporting **Google Gemini 2.5 Flash**, **Groq (Llama-3.3-70B)**, and **OpenAI (GPT-4o-mini)**. Inspects subtle psychological pretexting, urgency manipulation, and supports **multimodal offer screenshot verification**.
 
 ---
 
-## Privacy & Data Handling Specification
+## Project Structure
 
-- **Zero Persistent Storage:** Submitted text payloads and uploaded files are processed strictly in-memory during active sessions. No communications or extracted PII are stored on disk or committed to databases.
-- **Client-Side Execution:** The web dashboard executes heuristic evaluations locally within the browser.
-- **No Model Training:** User submissions are never retained, logged, or utilized to train commercial models or classifiers.
-- **No Tracking Telemetry:** Contains zero third-party advertising trackers or behavioral analytics pixels.
-
----
-
-## Terms of Service & Legal Disclaimer
-
-- **Informational & Diagnostic Utility:** Outputs and risk ratings are non-binding heuristic indicators designed to aid threat awareness. Users must independently verify offers with university placement directorates or corporate directories.
-- **Nominative Trademark Usage:** Any mentions of corporate names (e.g. Microsoft, Infosys) are purely nominative to describe and identify potential impersonation vectors.
-- **Permitted Purpose:** Authorized exclusively for personal verification, security research, and academic evaluation.
-
----
-
-## Custom Domain Configuration
-
-ProofLens is structured for production deployment behind a validated custom domain (e.g., via Cloudflare Pages, GitHub Pages, or a reverse proxy):
-
-1. **DNS Setup:**
-   - Configure a `CNAME` record pointing your custom domain (e.g. `verify.yourdomain.org`) to your hosting endpoint.
-2. **TLS/SSL Enforcement:**
-   - Enforce HTTPS and TLS 1.3 encryption across all communication pathways.
-3. **HTTP Strict Transport Security (HSTS):**
-   - Enable HSTS headers on the edge proxy to prevent protocol downgrade attacks.
+```text
+ProofLens/
+├── app.py              # Streamlit Python backend & console interface
+├── verifier.py         # Heuristics engine & modular AI model adapter
+├── index.html          # Standalone frontend with Tailwind CSS & Motion.dev
+├── samples.py          # Reference scam and legitimate communication presets
+├── test_verifier.py    # Pytest unit test suite
+└── README.md           # Technical specification & project documentation
